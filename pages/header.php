@@ -19,7 +19,7 @@
                 </a>
                 
                 <div class="hidden md:flex items-center gap-14 text-sm-bold font-medium ">
-                    <a href="reserver.php" class="transition-colors hover:text-indigo-600">Réserver</a>
+                    <a href="./pages/reserver.php" class="transition-colors hover:text-indigo-600">Réserver</a>
                     <a href="machines.php" class="transition-colors hover:text-indigo-600">Machines</a>
                     
                     <a href="login.php" class="bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all shadow-sm active:scale-95">
