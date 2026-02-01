@@ -1,9 +1,24 @@
+<?php
+
+// Si la page est appelée directement par son adresse, on redirige en passant pas la page index
+if (basename($_SERVER["PHP_SELF"]) != "index.php") {
+  header("Location:../index.php");
+  die("");
+}
+
+// Pose qq soucis avec certains serveurs...
+echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
+?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FabLab</title>
+
+    <link rel="shortcut icon" href="./img/logo.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
