@@ -18,9 +18,10 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FabLab</title>
 
-    <link rel="shortcut icon" href="./img/logo.png">
     
+    <link rel="shortcut icon" href="./img/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/style.css" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
 

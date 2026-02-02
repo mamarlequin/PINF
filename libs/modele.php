@@ -63,4 +63,5 @@ function inscription($nom, $prenom, $passe, $promo)
 }
 
 
+
 ?>
