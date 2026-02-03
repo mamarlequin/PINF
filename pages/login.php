@@ -11,9 +11,11 @@ $prenom = valider("prenom", "COOKIE");
 $passe = valider("motdepasse", "COOKIE");
 $checked = valider("remember", "COOKIE") ? "checked" : "";
 ?>
-<?php 
-echo "<div class='form-card'>";
-mkForm("controleur.php", "get", "form-connexion");
+
+
+<div class='form-card'>
+    <?php 
+    mkForm("controleur.php", "get", "form-connexion");
        echo "<h1 class='text-center'>Connexion</h1>";
        echo "Nom de famille";
         mkInput("text", "nom", $login);
@@ -29,6 +31,5 @@ mkForm("controleur.php", "get", "form-connexion");
             echo "Pas encore inscrit ? <a href='index.php?view=inscription'>Inscrivez-vous</a>";
         echo "</p>";
     endForm();
-echo "</div>";
-
-?>
+    ?>
+</div>

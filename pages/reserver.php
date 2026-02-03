@@ -23,12 +23,29 @@ $reservations = [
     ['id' => 106, 'idEquipement' => 5, 'dateDebut' => '2025-12-01 10:30:00', 'dateFin' => '2025-12-01 12:30:00'],
 ];
 
+$creneaux = [
+    ['id' => 1, 'idAdmin' => 1, 'dateDebut' => '2026-02-02 09:00:00', 'dateFin' => '2026-02-02 12:00:00'],
+    ['id' => 2, 'idAdmin' => 1, 'dateDebut' => '2026-02-02 13:30:00', 'dateFin' => '2026-02-02 18:00:00'],
+    ['id' => 3, 'idAdmin' => 2, 'dateDebut' => '2026-02-03 09:00:00', 'dateFin' => '2026-02-03 18:00:00'],
+    ['id' => 4, 'idAdmin' => 1, 'dateDebut' => '2026-02-04 14:00:00', 'dateFin' => '2026-02-04 20:00:00'],
+    ['id' => 5, 'idAdmin' => 2, 'dateDebut' => '2026-02-05 08:30:00', 'dateFin' => '2026-02-05 17:30:00'],
+    ['id' => 6, 'idAdmin' => 1, 'dateDebut' => '2026-02-06 09:00:00', 'dateFin' => '2026-02-06 16:00:00'],
+];
+
+$planningAdmin = [];
+foreach ($creneaux as $c) {
+    $jour = date('Y-m-d', strtotime($c['dateDebut']));
+    $planningAdmin[$jour][] = [
+        'debut' => date('H:i', strtotime($c['dateDebut'])),
+        'fin'   => date('H:i', strtotime($c['dateFin'])),
+        'idAdmin' => $c['idAdmin']
+    ];
+}
+
 $planning = [];
 foreach ($reservations as $res) {
     $jour = date('Y-m-d', strtotime($res['dateDebut']));
     $planning[$res['idEquipement']][$jour][] = $res;
-
-
 
 
 
@@ -44,7 +61,7 @@ if ($offset !== 0) {
 }
 ?>
 
-<div class="max-w-full bg-white border border-gray-400 rounded-lg shadow-sm overflow-hidden font-sans">
+<div class="max-w-full bg-white border border-gray-400 rounded-lg shadow-sm overflow-hidden font-sans select-none">
     <div class="flex border-b border-gray-400 text-xs font-bold text-gray-500 uppercase">
 
         <div class="w-56 p-4 border-r border-gray-400 flex items-center justify-between">
@@ -60,11 +77,29 @@ if ($offset !== 0) {
         <?php
         $noms = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM'];
 
+        $dateJour = clone $dateCurseur;
         foreach ($noms as $i => $nom): ?>
             <div class="flex-1 p-4 text-center border-r border-gray-400 last:border-r-0">
+                <?= $nom ?> 
+                <?= $dateJour->format('d') 
+                ?>
 
-                <?= $nom ?> <?= $dateCurseur->format('d') ?>
-                <?php $dateCurseur->modify('+1 day'); ?>
+                <?php
+                $cle = $dateJour->format('Y-m-d'); 
+                ?>
+
+                <div class="mt-2 flex flex-col gap-1">
+                    <?php if (isset($planningAdmin[$cle])): ?>
+                        <?php foreach ($planningAdmin[$cle] as $c): ?>
+                            <span class="text-[9px] bg-green-100 text-green-700 px-1 py-0.5 rounded border border-green-200">
+                                Admin <?= $c['idAdmin'] ?>: <?= $c['debut'] ?>-<?= $c['fin'] ?>
+                            </span>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <span class="text-[9px] text-red-400 italic">Pas d'admin</span>
+                    <?php endif; ?>
+                </div>
+                <?php $dateJour->modify('+1 day'); ?>
 
             </div>
         <?php endforeach; ?>
@@ -76,14 +111,24 @@ if ($offset !== 0) {
         <div class="w-56 p-4 border-r border-gray-400 flex items-center font-bold text-gray-700 text-xs uppercase ">
             <?= $m['nom'] ?>
         </div>
-
-        <?php for($i=0; $i<6; $i++): 
-            $date = date('Y-m-d', strtotime("2025-12-01 + $i days"));
-            $indisponible = ($m['enMaintenance'] == 1); 
+        <?php
+        $dateStock = (clone $dateCurseur);
+        for($i=0; $i<6; $i++): 
+            
+            $date = $dateStock->format('Y-m-d');
+            $dateStock->modify("+1 day");
+            if($m['enMaintenance'] == 1){
+                $bg = "bg-stripes";
+            }elseif(!isset($planningAdmin[$date])){
+                $bg = "bg-gray-200";
+            }else{
+                $bg = '';
+            }
+            
             ?>
-            <div class="flex-1 p-2 border-r border-gray-400 flex flex-col gap-2 <?= $indisponible ? 'bg-stripes' : '' ?>">
+            <div class="flex-1 p-2 border-r border-gray-400 flex flex-col gap-2 <?= $bg ?>">
                 <?php 
-                if (!$indisponible && isset($planning[$m['id']][$date])): 
+                if (isset($planning[$m['id']][$date])): 
                     foreach ($planning[$m['id']][$date] as $res): 
                         $heure = date('H:i', strtotime($res['dateDebut'])) . '-' . date('H:i', strtotime($res['dateFin']));
                         $color = ($m['id'] % 2 == 0) ? 'bg-blue-400' : 'bg-purple-500';
