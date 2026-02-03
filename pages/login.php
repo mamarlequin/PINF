@@ -27,9 +27,7 @@ $checked = valider("remember", "COOKIE") ? "checked" : "";
         mkInput("checkbox", "remember", "1", $checked);
         mkInput("submit", "action", "Connexion");
 
-        echo "<p class='mt-3 text-center'>";
-            echo "Pas encore inscrit ? <a href='index.php?view=inscription'>Inscrivez-vous</a>";
-        echo "</p>";
+
     endForm();
     ?>
 </div>
