@@ -45,7 +45,7 @@ function isAdmin($idUser)
 		$dbh->exec("SET CHARACTER SET utf8");
 
 		// Utilisation d'une requête préparée pour éviter les injections SQL
-		$sql = "SELECT id FROM user WHERE id = ? AND admin = '1'";
+		$sql = "SELECT id FROM Utilisateur WHERE id = ? AND (role = '1' OR role = '2')";
 		$stmt = $dbh->prepare($sql);
 		$stmt->execute([$idUser]);
 
@@ -62,6 +62,19 @@ function inscription($nom, $prenom, $passe, $promo)
 	SQLInsert($SQL);
 }
 
+function lister_machine(){
+	$SQL = "SELECT * FROM Equipement";
+	return SQLSelect($SQL);
+}
 
+function creer_equip($nom, $type, $description, $risque){
+	$SQL = "INSERT INTO Equipement (nom, type, enMaintenance, description, risque) VALUES ('$nom', '$type', 0, '$description', '$risque')";
+	SQLInsert($SQL);
+}
+
+function supp_equip($id){
+	$SQL = "DELETE FROM Equipement WHERE id = '$id'";
+	SQLDelete($SQL);
+}
 
 ?>

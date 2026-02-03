@@ -106,6 +106,25 @@ break;
 			case 'Connectez-vous pour commencer' : 
 				$qs = array("view" => "login");
 				break;
+
+			case 'Créer le nouvel équipement' : 
+				$nom = valider("nom");
+				$type = valider("type");
+				$description = valider("description");
+				$risque = valider("risques");
+				if ($nom && $type && $description && $risque && isAdmin($_SESSION["idUser"])){
+					creer_equip($nom, $type, $description, $risque);
+					$qs = array("view"=> "machines", "msg" => "Création réussie");
+				}
+				else $qs = array("view"=> "machines", "msg" => "Création échouée");
+				break;
+
+			case '-' : 
+				if ($id = valider("id")){
+					supp_equip($id);
+					$qs = array("view"=> "machines", "msg" => "Suppression réussie");
+				}
+				else $qs = array("view"=> "machines", "msg" => "Suppression échouée");
 		}
 	}
 

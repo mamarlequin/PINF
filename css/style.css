@@ -115,6 +115,18 @@ input[type="number"] {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   flex : 1;
   margin : auto;
+  position: relative;
+}
+
+.groupe11 {
+  margin: 20px auto;
+  padding: 30px;
+  flex : 1;
+  margin : auto;
+}
+
+#hid {
+    display: none;
 }
 
 .bg-stripes {
