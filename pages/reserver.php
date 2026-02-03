@@ -60,6 +60,52 @@ if ($offset !== 0) {
 
 }
 ?>
+<script type="text/javascript">
+
+$(document).ready(function() {
+    const $popup = $("#pop-reservation");
+    var caseCliquee = null;
+
+    $(".case-libre").on("click", function(e) {
+
+        e.stopPropagation();
+
+        if(caseCliquee == this){
+            return;
+        }
+
+        caseCliquee = this;
+
+        $("#debut").val("");
+        $("#fin").val("");
+
+        
+
+        const idMachine = $(this).data("machine");
+        const date = $(this).data("date");
+
+        $("#form-machine").val(idMachine);
+        $("#form-date").val(date);
+        $("#info-res").text("Machine " + idMachine + " le " + date);
+
+        $popup.css({
+            top: e.pageY + 10 + "px",
+            left: e.pageX + 10 + "px"
+        }).removeClass("hidden");
+    });
+
+    $popup.on("click", function(e) {
+        e.stopPropagation();
+    });
+
+    $(document).on("click", function() {
+        $popup.addClass("hidden");
+        caseCliquee = null;
+    });
+});
+
+
+</script>
 
 <div class="max-w-full bg-white border border-gray-400 rounded-lg shadow-sm overflow-hidden font-sans select-none">
     <div class="flex border-b border-gray-400 text-xs font-bold text-gray-500 uppercase">
@@ -105,7 +151,9 @@ if ($offset !== 0) {
         <?php endforeach; ?>
     </div>
 
-    <?php foreach ($machines as $m): ?>
+    <?php foreach ($machines as $m): 
+        
+    ?>
     <div class="flex border-b border-gray-400 h-auto min-h-[60px]">
         
         <div class="w-56 p-4 border-r border-gray-400 flex items-center font-bold text-gray-700 text-xs uppercase ">
@@ -113,6 +161,8 @@ if ($offset !== 0) {
         </div>
         <?php
         $dateStock = (clone $dateCurseur);
+        $idMachine = $m['id']; 
+        $dateCellule = $dateStock->format('Y-m-d');
         for($i=0; $i<6; $i++): 
             
             $date = $dateStock->format('Y-m-d');
@@ -122,11 +172,13 @@ if ($offset !== 0) {
             }elseif(!isset($planningAdmin[$date])){
                 $bg = "bg-gray-200";
             }else{
-                $bg = '';
+                $bg = 'hover:bg-gray-100 cursor-pointer case-libre';
             }
             
             ?>
-            <div class="flex-1 p-2 border-r border-gray-400 flex flex-col gap-2 <?= $bg ?>">
+            <div class="flex-1 p-2 border-r border-gray-400 flex flex-col gap-2 <?=$bg?>" 
+            data-machine="<?= $idMachine ?>" 
+            data-date="<?= $dateCellule ?>">
                 <?php 
                 if (isset($planning[$m['id']][$date])): 
                     foreach ($planning[$m['id']][$date] as $res): 
@@ -144,4 +196,27 @@ if ($offset !== 0) {
         <?php endfor; ?>
     </div>
 <?php endforeach; ?>
+</div>
+
+<div id="pop-reservation" class="hidden absolute z-[100] bg-white border border-gray-300 shadow-xl rounded-lg p-4 w-64 border-t-4 border-t-indigo-600">
+    <h3 class="font-bold text-indigo-600 mb-2">Réserver</h3>
+    <p id="info-res" class="text-xs text-gray-500 mb-4"></p>
+    
+    <form action="controleur.php" method="POST" class="space-y-3">
+        <input type="hidden" name="id_machine" id="form-machine">
+        <input type="hidden" name="date_res" id="form-date">
+        
+        <div>
+            <label class="block text-[10px] uppercase font-bold text-gray-400">Heure début</label>
+            <input type="time" id="debut" name="debut" class="w-full border rounded px-2 py-1 text-sm" required>
+        </div>
+        <div>
+            <label class="block text-[10px] uppercase font-bold text-gray-400">Heure fin</label>
+            <input type="time" id="fin" name="fin" class="w-full border rounded px-2 py-1 text-sm" required>
+        </div>
+
+        <button type="submit" name="action" value="reserver" class="w-full bg-indigo-600 text-white py-2 rounded text-sm hover:bg-indigo-700">
+            Valider
+        </button>
+    </form>
 </div>

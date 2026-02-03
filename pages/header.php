@@ -18,7 +18,6 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FabLab</title>
 
-
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="shortcut icon" href="./img/logo.png">
     
@@ -29,8 +28,11 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
 
     </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
+
 <body class="text-slate-800 mx-20">
+
     <nav class="max-w-6xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 sticky top-4 my-10 z-50">
         <div class="bg-slate-300 rounded-full border shadow-sm px-6 flex items-center py-2 justify-between h-1-">
                 <a href="index.php?view=main" style="margin-right:20px;">
