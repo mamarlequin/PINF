@@ -1,7 +1,6 @@
 <?php
-$BDD_host = "localhost";
-$BDD_user = "Alexandra"; //a changer pour vous
-$BDD_password = "Scarlet2Edmond!"; //a changer pour vous
-$BDD_base = "Fablab"; //si vous avez appelez la base autrement a changer pour vous aussi
-
+$BDD_host="localhost";
+$BDD_user="edegezel";
+$BDD_password="@ayuchiwa05"; // vide sous windows
+$BDD_base = "Fablab2iV3"; //si vous avez appelez la base autrement a changer pour vous aussi
 ?>

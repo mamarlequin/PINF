@@ -12,8 +12,8 @@ function verifUserbdd($nom, $prenom, $motdepasse)
 		$dbh = new PDO("mysql:host=$BDD_host;dbname=$BDD_base", $BDD_user, $BDD_password);
 		$dbh->exec("SET CHARACTER SET utf8");
 
-		$sql = "SELECT id, mdp 
-                FROM user 
+		$sql = "SELECT id, motDePasse 
+                FROM Utilisateur 
                 WHERE nom = ? AND prenom = ?";
 
 		$stmt = $dbh->prepare($sql);
@@ -21,7 +21,7 @@ function verifUserbdd($nom, $prenom, $motdepasse)
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
-		if ($result && $motdepasse === $result['mdp']) {
+		if ($result && $motdepasse === $result['motDePasse']) {
 			return $result['id'];
 		} else {
 			return false;
