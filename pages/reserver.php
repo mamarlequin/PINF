@@ -9,19 +9,9 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 
 <script type="text/javascript">
 
-
-
-const planningAdmin = {
-    "2026-02-02": [{debut: "09:00", fin: "12:00", idAdmin: 1}, {debut: "13:30", fin: "18:00", idAdmin: 1}],
-    "2026-02-03": [{debut: "09:00", fin: "18:00", idAdmin: 2}],
-    "2026-02-04": [{debut: "14:00", fin: "20:00", idAdmin: 1}],
-    "2026-02-05": [{debut: "08:30", fin: "17:30", idAdmin: 2}],
-    "2026-02-06": [{debut: "09:00", fin: "16:00", idAdmin: 1}]
-};
-
-const planningReservations = {
-    1 : {"2025-12-01": [{debut: "10:30", fin: "12:30"}]}, 
-};
+var planningAdmin = {};
+var planningReservations = {};
+var machines = [];
 
 var offsetPage = 0;
 
@@ -31,6 +21,16 @@ function getLundiDeCetteSemaine() {
     d.setDate(d.getDate() - d.getDay() + (d.getDay() == 0 ? -6 : 1));
 
     return d;
+}
+
+function estDansIntervalle(dateCaseCle, dateDebutFull, dateFinFull) {
+    // Sécurité : si les dates sont absentes, on retourne faux
+    if (!dateDebutFull || !dateFinFull) return false;
+
+    var dStart = dateDebutFull.split(' ')[0];
+    var dEnd = dateFinFull.split(' ')[0];
+    
+    return (dateCaseCle >= dStart && dateCaseCle <= dEnd);
 }
 
 function chargerSemaine(offset) {
@@ -92,6 +92,7 @@ function afficherLigne(m, lundiRef) {
         ligne += `
         <div class="flex-1 p-2 border-r border-gray-400 flex flex-col gap-2 ${bgClass}" ${clickAction}>
             ${afficherRes(m.id, cle)}
+            ${afficherEmprunts(m.id, cle)}
         </div>`;
         jour.setDate(jour.getDate() + 1);
     }
@@ -105,7 +106,7 @@ function afficherAdmins(cle) {
     {
         rep += `
         <span class="text-[9px] bg-green-100 text-green-700 px-1 py-0.5 rounded border border-green-200">
-            Admin ${m.idAdmin}: ${m.debut}-${m.fin}
+           ${m.prenom}: ${m.debut}-${m.fin}
         </span>
     `;
     }
@@ -113,15 +114,67 @@ function afficherAdmins(cle) {
 }
 
 function afficherRes(mId, dateCle) {
-    if (!planningReservations[mId] || !planningReservations[mId][dateCle]) return "";
+    if (!planningReservations[mId]) return "";
     var rep = "";
-    for(r of planningReservations[mId][dateCle])
-    {
-        rep += `
-        <div class="bg-indigo-500 text-white text-[10px] py-2 px-1 rounded shadow-sm text-center">
-            ${r.debut} - ${r.fin}
-        </div>
-    `;
+    for (var r of planningReservations[mId]) {
+        if (estDansIntervalle(dateCle, r.dateDebut, r.dateFin)) {
+            var hover = "cursor-default";
+            if (r.idUser == <?php echo valider("idUser", "SESSION") ?>) {
+                hover = "hover:bg-indigo-600 cursor-pointer";
+            }
+
+            var texte = "";
+            var dStart = r.dateDebut.split(' ')[0];
+            var dEnd = r.dateFin.split(' ')[0];
+
+            if (dStart === dEnd) {
+                texte = r.debut + " - " + r.fin;
+            } else if (dateCle === dStart) {
+                texte = "Début : " + r.debut;
+            } else if (dateCle === dEnd) {
+                texte = "Fin : " + r.fin;
+            } else {
+                texte = "Réservation en cours...";
+            }
+
+            rep += `
+            <div class="bg-indigo-500 text-white text-[10px] py-2 px-1 rounded shadow-sm ${hover} text-center mb-1">
+                ${texte}
+            </div>`;
+        }
+    }
+    return rep;
+}
+
+function afficherEmprunts(mId, dateCle) {
+    if (!planningEmprunts[mId]) return "";
+    var rep = "";
+
+    for (var e of planningEmprunts[mId]) {
+        if (estDansIntervalle(dateCle, e.dateDebut, e.dateFin)) {
+            
+            var hover = "cursor-default";
+            if (e.idUser == <?php echo valider("idUser", "SESSION") ?>) {
+                hover = "hover:bg-green-600 cursor-pointer";
+            } 
+
+            var texte = "Emprunt";
+            var dStart = e.dateDebut.split(' ')[0];
+            var dEnd = e.dateFin.split(' ')[0];
+            
+            if (dStart === dEnd) {
+                texte = e.heureDebut + " - " + e.heureFin;
+            } else if (dateCle === dStart) {
+                texte = "Début : " + e.heureDebut;
+            } else if (dateCle === dEnd) {
+                texte = "Fin : " + e.heureFin;
+            }
+
+            rep += `
+            <div class="bg-green-500 text-white text-[10px] py-2 px-1 rounded shadow-sm ${hover} text-center mb-1">
+                ${texte}
+            </div>`;
+        }
     }
     return rep;
 }
@@ -139,7 +192,45 @@ $(document).ready(function() {
         dataType: "json",
         success: function(oRep){
             machines = oRep;
-            chargerSemaine(0);
+
+            $.ajax({
+                type: "POST",
+                url: "ajax.php",
+                data: {"action": "lister_dispo"},
+                dataType: "json",
+                success: function(oRep){
+                    planningAdmin = oRep;
+
+                    $.ajax({
+                        type: "POST",
+                        url: "ajax.php",
+                        data: {"action": "lister_res"},
+                        dataType: "json",
+                        success: function(oRep){
+                            planningReservations = oRep;
+                            $.ajax({
+                                type: "POST",
+                                url: "ajax.php",
+                                data: {"action": "lister_emprunts"},
+                                dataType: "json",
+                                success: function(oRep){
+                                    planningEmprunts = oRep;
+                                    chargerSemaine(0);
+                                },
+                                error: function(){
+                                    console.log("Erreur lors de la récupération des emprunts");
+                                },    
+                            });  
+                        },
+                        error: function(){
+                            console.log("Erreur lors de la récupération des dispos");
+                        },	
+                    });
+                },
+                error: function(){
+                    console.log("Erreur lors de la récupération des dispos");
+                },	
+            });
         },
         error: function(){
             console.log("Erreur lors de la récupération des machines");
@@ -186,14 +277,8 @@ $(document).ready(function() {
 </script>
 
 
-
-
 <div id="calendrier-container" class="max-w-full bg-white border border-gray-400 rounded-lg shadow-sm overflow-hidden font-sans select-none">
 </div>
-
-
-
-
 
 
 <div id="pop-reservation" class="hidden absolute z-[100] bg-white border border-gray-300 shadow-xl rounded-lg p-4 w-64 border-t-4 border-t-indigo-600">

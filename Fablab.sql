@@ -36,9 +36,9 @@ CREATE TABLE Emprunt (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     idUser INT UNSIGNED NOT NULL,
     idEquipement INT UNSIGNED NOT NULL,
-    dateDebut DATE NOT NULL,
-    dateRenduTheorique DATE NOT NULL,
-    dateRenduReel DATE NULL,
+    dateDebut DATETIME NOT NULL,
+    dateRenduTheorique DATETIME NOT NULL,
+    dateRenduReel DATETIME NULL,
     CONSTRAINT emprunt_iduser_fk
         FOREIGN KEY (idUser) REFERENCES Utilisateur(id)
         ON DELETE CASCADE,
