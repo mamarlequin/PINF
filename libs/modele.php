@@ -77,4 +77,25 @@ function supp_equip($id){
 	SQLDelete($SQL);
 }
 
+function recherche_machine($mot){
+$SQL = "SELECT * FROM Equipement WHERE nom NOT LIKE '%" . $mot . "%'";
+return parcoursRs(SQLSelect($SQL));
+
+}
+
+function dispa($mot){
+$SQL = "SELECT * FROM Equipement WHERE nom LIKE '%" . $mot . "%'";
+return parcoursRs(SQLSelect($SQL));
+
+}
+
+function listercom($id){
+	$SQL = "SELECT * FROM Commentaire JOIN Equipement 
+	ON Commentaire.idEquipement = Equipement.id 
+	JOIN Utilisateur
+	ON Commentaire.idUser = Utilisateur.id
+	WHERE Equipement.id = '$id'";
+	return parcoursRs(SQLSelect($SQL));
+}
+
 ?>
