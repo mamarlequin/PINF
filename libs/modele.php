@@ -187,4 +187,55 @@ function lister_emprunts($debut, $fin)
     return $planning;
 }
 
+
+function set_maintenance($id, $etatActuel) {
+    $nouvelEtat = ($etatActuel == 0) ? 1 : 0; 
+    $SQL = "UPDATE Equipement SET enMaintenance = '$nouvelEtat' WHERE id = '$id'";
+    return SQLUpdate($SQL); 
+}
+
+function ajouter_dispo($idAdmin, $dateDebut, $dateFin) {
+    $SQL = "INSERT INTO Creneau (idAdmin, dateDebut, dateFin) 
+            VALUES ('$idAdmin', '$dateDebut', '$dateFin')";
+    return SQLInsert($SQL);
+}
+function lister_mes_dispos($idAdmin) {
+    $SQL = "SELECT * FROM Creneau WHERE idAdmin = '$idAdmin' ORDER BY dateDebut DESC";
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function supprimer_dispo($idCreneau, $idAdmin) {
+    $SQL = "DELETE FROM Creneau WHERE id = '$idCreneau' AND idAdmin = '$idAdmin'";
+    return SQLDelete($SQL);
+}
+
+function modifier_dispo($idCreneau, $dateDebut, $dateFin) {
+    $SQL = "UPDATE Creneau 
+            SET dateDebut = '$dateDebut', dateFin = '$dateFin' 
+            WHERE id = '$idCreneau'";
+    return SQLUpdate($SQL);
+}
+
+function creer_utilisateur($nom, $prenom, $email, $role) {
+
+    $mdp = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 8);
+    
+    
+    $SQL = "INSERT INTO Utilisateur (nom, prenom, adresseMail, motDePasse, role, promotion) 
+            VALUES ('$nom', '$prenom', '$email', '$mdp', '$role', 2026)";
+    
+    $id = SQLInsert($SQL);
+    
+    
+    if ($id) return $mdp; 
+    return false;
+}
+
+function ajouter_commentaire($idEquip, $idUser, $texte) {
+    $texte = addslashes($texte);
+    $SQL = "INSERT INTO Commentaire (idEquipement, idUser, texte, resolu) 
+            VALUES ('$idEquip', '$idUser', '$texte', 0)";
+    return SQLInsert($SQL);
+}
+
 ?>
