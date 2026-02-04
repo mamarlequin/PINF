@@ -35,20 +35,33 @@ function estDansIntervalle(dateCaseCle, dateDebutFull, dateFinFull) {
 
 function chargerSemaine(offset) {
     offsetPage = offset;
-    
-    var lundi = getLundiDeCetteSemaine();
-    lundi.setDate(lundi.getDate() + (offset * 7));
-    
-    const moisAnnee = lundi.toLocaleDateString('fr-FR', {month: 'short', year: 'numeric'}).toUpperCase();
-    const dateLundiSQL = lundi.toISOString().split('T')[0];
 
-    var html = afficherTete(lundi, moisAnnee);
-    
-    machines.forEach(m => {
-        html += afficherLigne(m, lundi);
+    $.ajax({
+        type: "POST",
+        url: "ajax.php",
+        data: {
+            "action": "charger_donnees_semaine",
+            "offset": offset
+        },
+        dataType: "json",
+        success: function(data) {
+            machines = data.machines;
+            planningAdmin = data.planningAdmin;
+            planningReservations = data.planningReservations;
+            planningEmprunts = data.planningEmprunts;
+
+            var lundi = new Date(data.lundi);
+            const moisAnnee = lundi.toLocaleDateString('fr-FR', {month: 'short', year: 'numeric'}).toUpperCase();
+
+            var html = afficherTete(lundi, moisAnnee);
+            machines.forEach(m => {
+                html += afficherLigne(m, lundi);
+            });
+            $('#calendrier-container').html(html);
+        }
     });
+
     
-    $('#calendrier-container').html(html);
 }
 
 function afficherTete(lundiRef, titre) {
@@ -185,57 +198,7 @@ $(document).ready(function() {
     const $popup = $("#pop-reservation");
     var caseCliquee = null;
 
-    $.ajax({
-        type: "POST",
-        url: "ajax.php",
-        data: {"action": "lister_machines"},
-        dataType: "json",
-        success: function(oRep){
-            machines = oRep;
-
-            $.ajax({
-                type: "POST",
-                url: "ajax.php",
-                data: {"action": "lister_dispo"},
-                dataType: "json",
-                success: function(oRep){
-                    planningAdmin = oRep;
-
-                    $.ajax({
-                        type: "POST",
-                        url: "ajax.php",
-                        data: {"action": "lister_res"},
-                        dataType: "json",
-                        success: function(oRep){
-                            planningReservations = oRep;
-                            $.ajax({
-                                type: "POST",
-                                url: "ajax.php",
-                                data: {"action": "lister_emprunts"},
-                                dataType: "json",
-                                success: function(oRep){
-                                    planningEmprunts = oRep;
-                                    chargerSemaine(0);
-                                },
-                                error: function(){
-                                    console.log("Erreur lors de la récupération des emprunts");
-                                },    
-                            });  
-                        },
-                        error: function(){
-                            console.log("Erreur lors de la récupération des dispos");
-                        },	
-                    });
-                },
-                error: function(){
-                    console.log("Erreur lors de la récupération des dispos");
-                },	
-            });
-        },
-        error: function(){
-            console.log("Erreur lors de la récupération des machines");
-        },	
-    });
+    chargerSemaine(0);
 
     $(".case-libre").on("click", function(e) {
 

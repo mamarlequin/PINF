@@ -9,19 +9,24 @@ header('Content-Type: application/json');
 $action = valider("action");
 
 switch($action) {
-    case "lister_machines":
-        echo json_encode(lister_machine()); 
-        break;
+    case "charger_donnees_semaine":
+        $offset = (int)valider("offset"); 
+        
+        $lundi = new DateTime('monday this week');
+        $lundi->modify("$offset weeks");
+        $debutSemaine = $lundi->format('Y-m-d 00:00:00');
+        
+        $dimanche = clone $lundi;
+        $dimanche->modify('+6 days');
+        $finSemaine = $dimanche->format('Y-m-d 23:59:59');
 
-    case "lister_dispo":
-        echo json_encode(lister_dispo());
-        break;
-
-    case "lister_res":
-        echo json_encode(lister_res());
-        break;
-    case "lister_emprunts":
-        echo json_encode(lister_emprunts());
+        echo json_encode([
+            "machines" => lister_machine(),
+            "planningAdmin" => lister_dispo($debutSemaine, $finSemaine),
+            "planningReservations" => lister_res($debutSemaine, $finSemaine),
+            "planningEmprunts" => lister_emprunts($debutSemaine, $finSemaine),
+            "lundi" => $lundi->format('Y-m-d')
+        ]);
         break;
     default:
         http_response_code(400);

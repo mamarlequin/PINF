@@ -72,10 +72,10 @@ function supp_equip($id){
 	SQLDelete($SQL);
 }
 
-function lister_dispo()
+function lister_dispo($debut, $fin)
 {
-    $sql = "SELECT c.idAdmin, c.dateDebut, c.dateFin, u.prenom FROM Creneau c JOIN Utilisateur u ON c.idAdmin = u.id ORDER BY c.dateDebut ASC";
-            
+    $sql = "SELECT c.idAdmin, c.dateDebut, c.dateFin, u.prenom FROM Creneau c JOIN Utilisateur u ON c.idAdmin = u.id WHERE c.dateDebut < '$fin' AND c.dateFin > '$debut' ORDER BY c.dateDebut ASC";
+
     $resultats = parcoursRs(SQLSelect($sql));
 
     $planningAdmin = [];
@@ -95,9 +95,12 @@ function lister_dispo()
     return $planningAdmin;
 }
 
-function lister_res()
+function lister_res($debut, $fin)
 {
-	$SQL = "SELECT id, idEquipement, dateDebut, dateFin, idUser FROM Reservation ORDER BY dateDebut ASC;";
+	$SQL = "SELECT id, idEquipement, dateDebut, dateFin, idUser 
+	FROM Reservation 
+	WHERE (dateDebut <= '$fin' OR dateFin >= '$debut')
+	ORDER BY dateDebut ASC;";
 	$resultats = parcoursRs(SQLSelect($SQL));
 	
 	$planning = array();
@@ -126,10 +129,11 @@ function lister_res()
 	return $planning;
 }
 
-function lister_emprunts()
+function lister_emprunts($debut, $fin)
 {
     $SQL = "SELECT id, idUser, idEquipement, dateDebut, dateRenduTheorique, dateRenduReel
             FROM Emprunt
+			WHERE (dateDebut <= '$fin' AND dateRenduTheorique >= '$debut')
             ORDER BY dateDebut DESC";
 
     $resultats = parcoursRs(SQLSelect($SQL));
