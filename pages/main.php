@@ -12,7 +12,7 @@
             </div>
             
             <div>
-                <a href="./pages/reserver.php" class="inline-block bg-white text-indigo-600 border border-indigo-600 px-8 py-3.5 rounded-xl font-semibold   hover:bg-indigo-700 hover:text-white transition-all shadow-md">
+                <a href="./pages/reserver.php" class="lien-protege inline-block bg-white text-indigo-600 border border-indigo-600 px-8 py-3.5 rounded-xl font-semibold   hover:bg-indigo-700 hover:text-white transition-all shadow-md">
                     Réservez dès maintenant
                 </a>
             </div>

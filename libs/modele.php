@@ -1,6 +1,7 @@
 <?php
 
 include_once("maLibSQL.pdo.php");
+
 function verifUserbdd($nom, $prenom, $motdepasse)
 {
 	global $BDD_host;
@@ -56,12 +57,6 @@ function isAdmin($idUser)
 	}
 }
 
-function inscription($nom, $prenom, $passe, $promo)
-{
-	$SQL = "INSERT INTO user (nom, prenom, promo, admin, mdp) VALUES ('$nom', '$prenom', '$promo', '0', '$passe')";
-	SQLInsert($SQL);
-}
-
 function lister_machine(){
 	$SQL = "SELECT * FROM Equipement";
 	return parcoursRs(SQLSelect($SQL));
@@ -76,6 +71,7 @@ function supp_equip($id){
 	$SQL = "DELETE FROM Equipement WHERE id = '$id'";
 	SQLDelete($SQL);
 }
+
 
 function recherche_machine($mot){
 $SQL = "SELECT * FROM Equipement WHERE nom NOT LIKE '%" . $mot . "%'";
@@ -96,6 +92,99 @@ function listercom($id){
 	ON Commentaire.idUser = Utilisateur.id
 	WHERE Equipement.id = '$id'";
 	return parcoursRs(SQLSelect($SQL));
+}
+
+
+function lister_dispo($debut, $fin)
+{
+    $sql = "SELECT c.idAdmin, c.dateDebut, c.dateFin, u.prenom FROM Creneau c JOIN Utilisateur u ON c.idAdmin = u.id WHERE c.dateDebut < '$fin' AND c.dateFin > '$debut' ORDER BY c.dateDebut ASC";
+
+    $resultats = parcoursRs(SQLSelect($sql));
+
+    $planningAdmin = [];
+
+    foreach ($resultats as $ligne) {
+        $dateCle = date('Y-m-d', strtotime($ligne['dateDebut']));
+        
+        $creneau = [
+            "debut"   => date('H:i', strtotime($ligne['dateDebut'])), 
+            "fin"     => date('H:i', strtotime($ligne['dateFin'])),   
+            "idAdmin" => (int)$ligne['idAdmin'],
+            "prenom"  => $ligne['prenom'] // Ajout du prénom récupéré par la jointure
+        ];
+        $planningAdmin[$dateCle][] = $creneau;
+    }
+
+    return $planningAdmin;
+}
+
+function lister_res($debut, $fin)
+{
+	$SQL = "SELECT id, idEquipement, dateDebut, dateFin, idUser 
+	FROM Reservation 
+	WHERE (dateDebut <= '$fin' OR dateFin >= '$debut')
+	ORDER BY dateDebut ASC;";
+	$resultats = parcoursRs(SQLSelect($SQL));
+	
+	$planning = array();
+
+	foreach ($resultats as $res) {
+		$jour = date('Y-m-d', strtotime($res['dateDebut']));
+		
+		$idEq = $res['idEquipement'];
+		
+		$heureDebut = date('H:i', strtotime($res['dateDebut']));
+		$heureFin = date('H:i', strtotime($res['dateFin']));
+
+		if (!isset($planning[$idEq])) {
+			$planning[$idEq] = array();
+		}
+		
+		$planning[$idEq][] = array(
+			"id" => $res['id'],
+			"dateDebut" => $res['dateDebut'],
+			"dateFin" => $res['dateFin'],
+			"debut" => $heureDebut,
+			"fin" => $heureFin,
+			"idUser" => $res['idUser']
+		);
+	}
+	return $planning;
+}
+
+function lister_emprunts($debut, $fin)
+{
+    $SQL = "SELECT id, idUser, idEquipement, dateDebut, dateRenduTheorique, dateRenduReel
+            FROM Emprunt
+			WHERE (dateDebut <= '$fin' AND dateRenduTheorique >= '$debut')
+            ORDER BY dateDebut DESC";
+
+    $resultats = parcoursRs(SQLSelect($SQL));
+    $planning = [];
+
+    foreach ($resultats as $ligne) {
+        $idEq = $ligne['idEquipement'];
+
+        $dateFin = ($ligne['dateRenduReel'] !== null) 
+                            ? $ligne['dateRenduReel'] 
+                            : $ligne['dateRenduTheorique'];
+
+        if (!isset($planning[$idEq])) {
+            $planning[$idEq] = array();
+        }
+
+        $planning[$idEq][] = array(
+            "id" => $ligne['id'],
+            "dateDebut" => $ligne['dateDebut'], 
+            "dateFin" => $dateFin,
+			"heureDebut" => date('H:i', strtotime($ligne['dateDebut'])),
+			"heureFin" => date('H:i', strtotime($dateFin)),
+            "idUser" => $ligne['idUser'],
+            "statut" => ($ligne['dateRenduReel'] !== null) ? "rendu" : "en cours"
+        );
+    }
+
+    return $planning;
 }
 
 ?>

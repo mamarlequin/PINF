@@ -9,8 +9,23 @@ header('Content-Type: application/json');
 $action = valider("action");
 
 switch($action) {
-    case "lister_machines":
-        echo json_encode(lister_machine()); 
+    case "charger_donnees_semaine":
+        $offset = (int)valider("offset"); 
+        
+        $lundi = new DateTime('monday this week');
+        $lundi->modify("$offset weeks");
+        $debutSemaine = $lundi->format('Y-m-d 00:00:00');
+        
+        $dimanche = clone $lundi;
+        $dimanche->modify('+6 days');
+        $finSemaine = $dimanche->format('Y-m-d 23:59:59');
+        echo json_encode([
+            "machines" => lister_machine(),
+            "planningAdmin" => lister_dispo($debutSemaine, $finSemaine),
+            "planningReservations" => lister_res($debutSemaine, $finSemaine),
+            "planningEmprunts" => lister_emprunts($debutSemaine, $finSemaine),
+            "lundi" => $lundi->format('Y-m-d')
+        ]);
         break;
 
     case "search":
@@ -26,6 +41,8 @@ switch($action) {
     case "afficher_com":
         $id = valider("id");
         echo json_encode(listercom($id));
+
+        
     default:
         http_response_code(400);
         echo json_encode(["error" => "Action inconnue"]);
