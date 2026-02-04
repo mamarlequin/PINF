@@ -64,7 +64,7 @@ function inscription($nom, $prenom, $passe, $promo)
 
 function lister_machine(){
 	$SQL = "SELECT * FROM Equipement";
-	return SQLSelect($SQL);
+	return parcoursRs(SQLSelect($SQL));
 }
 
 function creer_equip($nom, $type, $description, $risque){

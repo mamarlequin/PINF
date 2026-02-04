@@ -9,14 +9,7 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 
 <script type="text/javascript">
 
-const machines = [
-    {id: 1, nom: 'IMPRIMANTE 3D 1', enMaintenance: 0},
-    {id: 2, nom: 'IMPRIMANTE 3D 2', enMaintenance: 0},
-    {id: 3, nom: 'DECOUPE LASER 1', enMaintenance: 0},
-    {id: 4, nom: 'DECOUPE LASER 2', enMaintenance: 1},
-    {id: 5, nom: 'IMPRIMANTE RESINE 1', enMaintenance: 0},
-    {id: 6, nom: 'IMPRIMANTE RESINE 2', enMaintenance: 1}
-];
+
 
 const planningAdmin = {
     "2026-02-02": [{debut: "09:00", fin: "12:00", idAdmin: 1}, {debut: "13:30", fin: "18:00", idAdmin: 1}],
@@ -139,7 +132,19 @@ $(document).ready(function() {
     const $popup = $("#pop-reservation");
     var caseCliquee = null;
 
-    chargerSemaine(0);
+    $.ajax({
+        type: "POST",
+        url: "ajax.php",
+        data: {"action": "lister_machines"},
+        dataType: "json",
+        success: function(oRep){
+            machines = oRep;
+            chargerSemaine(0);
+        },
+        error: function(){
+            console.log("Erreur lors de la récupération des machines");
+        },	
+    });
 
     $(".case-libre").on("click", function(e) {
 

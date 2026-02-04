@@ -4,7 +4,7 @@ CREATE TABLE Utilisateur (
     prenom VARCHAR(255) NOT NULL,
     promotion INT NULL,
     motDePasse VARCHAR(255) NOT NULL,
-    role VARCHAR(100) NOT NULL,
+    role INT NOT NULL,
     adresseMail VARCHAR(255) NOT NULL UNIQUE,
     dateFinRole DATE NULL
 );
