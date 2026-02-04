@@ -84,29 +84,6 @@ break;
 				            "msg" => "Déconnexion réussie");
 			break;
 			
-			///////////////////////////////////////////////////////////////////
-            case 'Inscription':
-				$nom = valider("nom");
-				$prenom = valider("prenom");
-				$promo = valider("promo");
-				$passe = valider("password");
-				$passe2 = valider("password2");
-				if ($nom && $prenom && $promo && $passe && $passe2) {
-					if($passe == $passe2){
-					inscription($nom, $prenom, $passe, $promo);
-					$qs = array("view" => "login", "msg" => "Inscription réussie");}
-					else {$qs = array("view" => "inscription", "msg" => "Les mots de passe ne correspondent pas");}
-				} else {
-					$qs = array("view" => "inscription", "msg" => "Veuillez remplir tous les champs");
-				}
-				break;
-
-				///////////////////////////////////////////////////////////////
-			
-			case 'Connectez-vous pour commencer' : 
-				$qs = array("view" => "login");
-				break;
-
 			case 'Créer le nouvel équipement' : 
 				$nom = valider("nom");
 				$type = valider("type");
