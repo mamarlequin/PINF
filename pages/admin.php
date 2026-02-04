@@ -19,8 +19,8 @@ if (!isAdmin($_SESSION["idUser"])) {
 
 ?>
 
-<div class="bg-white shadow-md rounded-lg p-6 mb-8 border-l-4 border-green-500">
-    <h2 class="text-xl font-semibold mb-4 text-green-700">Indiquer mes disponibilités</h2>
+<div class="bg-white shadow-md rounded-lg p-6 mb-8 mt-10 border-l-4 border-indigo-500 max-w-5xl mx-auto">
+    <h2 class="text-xl font-semibold mb-4 text-indigo-700">Indiquer mes disponibilités</h2>
     <form action="controleur.php" method="POST" class="flex flex-wrap gap-4 items-end">
         <div>
             <label class="block text-sm font-medium text-gray-700">Début</label>
@@ -33,9 +33,9 @@ if (!isAdmin($_SESSION["idUser"])) {
         <input type="submit" name="action" value="Enregistrer Dispo" class="bg-green-600 text-white px-6 py-2 rounded-3xl hover:bg-green-700 transition-all cursor-pointer">
     </form>
 </div>
-<div class="bg-white shadow-xl rounded-3xl p-8 border border-gray-100 max-w-2xl mx-auto mt-10">
+<div class="bg-white shadow-xl rounded-3xl p-8 border border-gray-100 max-w-5xl mx-auto mt-10">
     <h2 class="text-2xl font-bold text-indigo-600 mb-6 flex items-center">
-        <span class="mr-2">👤</span> Ajouter un membre au Fablab
+        Ajouter un membre au Fablab
     </h2>
 
     <form action="controleur.php" method="POST" class="space-y-4">
@@ -56,36 +56,4 @@ if (!isAdmin($_SESSION["idUser"])) {
             Créer le compte et envoyer les accès
         </button>
     </form>
-</div>
-
-<div class="bg-white shadow-xl rounded-2xl p-6 mt-10">
-    <h2 class="text-2xl font-bold mb-6">Gestion du parc machines</h2>
-    <div class="grid grid-cols-1 gap-4">
-        <?php
-        $machines = lister_machine();
-        foreach ($machines as $m) {
-            $couleurStatut = $m['enMaintenance'] ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700";
-            $texteBouton = $m['enMaintenance'] ? "Remettre en service" : "Mettre en maintenance";
-            $classeBouton = $m['enMaintenance'] ? "bg-green-500 hover:bg-green-600" : "bg-orange-500 hover:bg-orange-600";
-
-            echo "
-            <div class='flex items-center justify-between p-4 border rounded-xl shadow-sm'>
-                <div>
-                    <span class='font-bold text-lg'>$m[nom]</span>
-                    <span class='ml-3 px-2 py-1 rounded-full text-xs font-bold $couleurStatut'>
-                        " . ($m['enMaintenance'] ? "MAINTENANCE" : "OPÉRATIONNELLE") . "
-                    </span>
-                </div>
-                <form action='controleur.php' method='POST'>
-                    <input type='hidden' name='id_equip' value='$m[id]'>
-                    <input type='hidden' name='etat_actuel' value='$m[enMaintenance]'>
-                    <button type='submit' name='action' value='Changer Maintenance' 
-                            class='text-white px-4 py-2 rounded-lg font-bold transition-colors $classeBouton'>
-                        $texteBouton
-                    </button>
-                </form>
-            </div>";
-        }
-        ?>
-    </div>
 </div>

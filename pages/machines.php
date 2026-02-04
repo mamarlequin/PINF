@@ -5,8 +5,8 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 	die("");
 }
 ?>
-<div class="flex items-center">
-	
+<div class="flex items-center mb-6">
+<button id='add_form' class='bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all mr-2 shadow-sm active:scale-95' onclick='afficher_form()'>+</button>
   <input
   id = "rechercheMachine"
     type="text"
@@ -35,8 +35,7 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 
 <?php
 if (isAdmin($_SESSION["idUser"])){
-echo "<button id='add_form' class='bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all shadow-sm active:scale-95' onclick='afficher_form()'>+</button>";
-echo "<div id='hid' class=groupe1>";
+echo "<div id='hid' class=groupe1 style='display:none;'>";
 mkForm("controleur.php");
 
 echo "Entrez le nom du nouvel équipement : ";
@@ -56,73 +55,89 @@ endForm();
 
 }
 $machines = lister_machine()?: [];
-
 foreach($machines as $machine){
-	
-echo "<div id='" . $machine["id"] . "' class='groupe1 relative'>";
-if (isAdmin($_SESSION["idUser"])){
-echo "<div class='absolute right-10'>";
-mkForm("controleur.php");
-echo "<input type='submit' name='action' value='-' class='!bg-indigo-600 !text-white !px-5 !py-2 !rounded-3xl !hover:bg-indigo-700 !shadow-sm !active:scale-95'>";
-mkInput("hidden", "id", $machine["id"]);
-endForm();
-echo "</div>";
-}
-	//echo "<div class='styled-button' style='background-color:indigo; color:white; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);border-radius: 30px;'>";
-	echo  "<h3 class='indent-2 text-2xl font-bold  text-indigo-600  rounded-3xl '>" . $machine["nom"]  . "</h3> ";
-	//echo "</div>";
-	echo "<p class='indent-2 break-keep'>" . $machine["type"] . "<BR>";
-	echo "<div class='indent-2 text-gray-500 break-keep'>" . $machine["description"] . "</div> <BR>";
-	echo "<div class='inline-block border-2 bg-red-500 border-red-500 text-white px-5 py-2 rounded-3xl'>";
-	echo $machine["risque"];
-	echo "</div>";
-	echo "<BR>";
-echo "<div id='comment' data-id='". $machine["id"] ."'class='flex justify-center'>";
-echo "<button class='add_form bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all shadow-sm active:scale-95' data-id='" . $machine["id"] . "'>Voir les commentaires</button>";
+    $isMaintenance = ($machine["enMaintenance"] == 1);
+    ?>
 
-echo "</div>";
-echo "</div>";
-echo "<BR>";
-}
+<div id="<?= $machine["id"] ?>" class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow relative">
+    
+    <div class="flex justify-between items-start mb-4">
+        <div>
+            <h3 class="text-2xl font-bold text-indigo-600 mb-2"><?= $machine["nom"] ?></h3>
+            <span class="text-sm font-medium px-2.5 py-0.5 rounded-full <?= $isMaintenance ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' ?>">
+                <?= $isMaintenance ? 'EN MAINTENANCE' : 'OPÉRATIONNELLE' ?>
+            </span>
+        </div>
 
+        <?php if (isAdmin($_SESSION["idUser"])): ?>
+            <form action="controleur.php" method="POST" onsubmit="return confirm('Supprimer cette machine ?');">
+                <input type="hidden" name="id" value="<?= $machine["id"] ?>">
+                <button type="submit" name="action" value="-" class="text-slate-400 uppercase hover:text-red-500 transition-colors p-2">
+                    x
+                </button>
+            </form>
+        <?php endif; ?>
+    </div>
 
+    <div class="mb-6">
+        <p class="text-slate-500 italic mb-2"><?= $machine["type"] ?></p>
+        <p class="text-slate-700 mb-4"><?= $machine["description"] ?></p>
+        
+        <?php if (!empty($machine["risque"])): ?>
+            <div class="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
+                <span class="text-sm font-bold uppercase tracking-wide">Risque : <?= $machine["risque"] ?></span>
+            </div>
+        <?php endif; ?>
+    </div>
 
-?>
+    <div class="flex flex-wrap gap-3 items-center border-t border-slate-100 pt-4">
+        
+        <button class='add_form flex-1 sm:flex-none bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-700 transition-all font-medium' data-id='<?=$machine["id"]?>'>
+            Voir les commentaires
+        </button>
+
+        <?php if (isAdmin($_SESSION["idUser"])): ?>
+            <form action='controleur.php' method='POST' class="flex-1 sm:flex-none">
+                <input type='hidden' name='dest' value='machines'>
+                <input type='hidden' name='id_equip' value='<?=$machine['id']?>'>
+                <input type='hidden' name='etat_actuel' value='<?=$machine['enMaintenance']?>'>
+                <button type='submit' name='action' value='Changer Maintenance' class='w-full text-white px-5 py-2  rounded-xl font-medium transition-colors <?=$isMaintenance ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'?>'>
+                    <?= $isMaintenance ? 'Réparé' : 'Maintenance' ?>
+                </button>
+            </form>
+        <?php endif; ?>
+
+    </div>
+</div>
+
+<?php } ?>
 
 <script>
 function afficher_form() {
-let hid = document.getElementById("hid");
-
-if (hid.style.display == "block"){
-	hid.style.display = "none";
-}else {
-    hid.style.display = "block";
-}
+    $("#hid").slideToggle(500);
 }
 
 $(document).ready(function(){
-$("#resultats").on("click", ".add_form", function()
- {
-    var id = $(this).data("id"); // récupère le data-id
+    $("#resultats").on("click", ".add_form", function()
+    {
+        var id = $(this).data("id"); 
 
-    $.ajax({
-        type: "GET",
-        url: "ajax.php",
-        data: { "action": "afficher_com", "id": id },
-        dataType: "json",
-        success: function(oRep) {
-            $("#comment").html(""); 
-            oRep.forEach(element => {
-                $("#comment").append("Nom : " + element.Utilisateur.prenom + "<br>");
-            });
-        },
-        error: function() {
-            console.log("Erreur lors de la récupération des machines");
-        }
+        $.ajax({
+            type: "GET",
+            url: "ajax.php",
+            data: { "action": "afficher_com", "id": id },
+            dataType: "json",
+            success: function(oRep) {
+                $("#comment").html(""); 
+                oRep.forEach(element => {
+                    $("#comment").append("Nom : " + element.Utilisateur.prenom + "<br>");
+                });
+            },
+            error: function() {
+                console.log("Erreur lors de la récupération des machines");
+            }
+        });
     });
-});
-
-
 
     $("#rechercheMachine").on("keyup", function () {
         var titre = $(this).val() || "";

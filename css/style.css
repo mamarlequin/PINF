@@ -130,25 +130,12 @@ input[type="number"] {
 }
 
 .bg-stripes {
-    background-color: #f3f4f6;
-    background-image: linear-gradient(135deg,  #97caa8 25%, transparent 25%, transparent 50%,  #97caa8 50%, #97caa8 75%, transparent 75%, transparent);
-    background-size: 10px 10px;
-}
-
-
-
-.recherche-input {
-  padding: 8px 12px;
-  border-radius: 9999px 0 0 9999px;
-  border: 1px solid #ccc;
-  outline: none;
-}
-
-.recherche-btn {
-  padding: 8px 12px;
-  border-radius: 0 9999px 9999px 0;
-  border: 1px solid #ccc;
-  border-left: none;
-  background: transparent;
-  cursor: pointer;
+    background: repeating-linear-gradient(
+        45deg,
+        #dcfce7,       /* Vert très clair (green-100) */
+        #dcfce7 6px,   /* Largeur de la bande verte */
+        #f0fdf4 6px,   /* Vert encore plus clair ou blanc (green-50) */
+        #f0fdf4 12px   /* Largeur totale du motif */
+    );
+    border-left: 1px solid #bbf7d0; /* Petite bordure pour délimiter les jours */
 }

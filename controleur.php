@@ -201,13 +201,15 @@ if ($action = valider("action")) {
 $urlBase = dirname($_SERVER["PHP_SELF"]) . "/index.php";
 // On redirige vers la page index avec les bons arguments
 
-if ($qs == "") {
-	// On renvoie vers la page précédente en se servant de HTTP_REFERER
-	// attention : il peut y avoir des champs en + de view...
-	$qs = parse_url($_SERVER["HTTP_REFERER"] . "&cle=val", PHP_URL_QUERY);
-	$tabQS = explode('&', $qs);
-	array_map('parseDataQS', $tabQS);
-	$qs = "?view=" . $dataQS["view"];
+if (empty($qs)) {
+    if (isset($_SERVER["HTTP_REFERER"])) {
+        $referer_queries = parse_url($_SERVER["HTTP_REFERER"], PHP_URL_QUERY);
+        parse_str($referer_queries, $output);
+        $view = isset($output['view']) ? $output['view'] : "main";
+    } else {
+        $view = "main";
+    }
+    $qs = array("view" => $view);
 }
 
 rediriger($urlBase, $qs);

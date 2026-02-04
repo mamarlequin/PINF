@@ -36,12 +36,12 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 
 </head>
 
-<body class="text-slate-800 mx-20">
+<body class="text-slate-800 w mx-20">
 
-    <nav class="max-w-6xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 sticky top-4 my-10 z-50">
-        <div class="bg-slate-300 rounded-full border shadow-sm px-6 flex items-center py-2 justify-between h-1-">
-            <a href="index.php?view=main" style="margin-right:20px;">
-                <img src="./img/logo.png" alt="logo du Fablab" width="85" />
+    <nav class="max-w-6xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 sticky top-4 mb-6 z-50">
+        <div class="bg-white/50 backdrop-blur-md rounded-full border shadow-sm px-6 flex items-center py-2 justify-between h-1-">
+            <a href="index.php?view=main" style="margin-right:20px;" class="transition-transform hover:scale-105">
+                <img src="./img/logo.png" alt="logo du Fablab" width="85" class="py-2"/>
             </a>
 
             <!-- Bouton menu mobile -->

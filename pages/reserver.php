@@ -67,11 +67,11 @@ function chargerSemaine(offset) {
 function afficherTete(lundiRef, titre) {
     const jours = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM'];
     var header = `
-    <div class="flex border-b border-gray-400 text-xs font-bold text-gray-500 uppercase">
-        <div class="w-56 p-4  border-r border-gray-400 flex items-center justify-between bg-gray-50">
-            <button onclick="chargerSemaine(${offsetPage - 1})" class="hover:bg-gray-200 p-1 px-2 rounded border border-gray-400"><</button>
-            <span class="text-gray-700">${titre}</span>
-            <button onclick="chargerSemaine(${offsetPage + 1})" class="hover:bg-gray-200 p-1 px-2 rounded border border-gray-400">></button>
+    <div class="flex border-t border-slate-200 bg-white top-0 z-10 ">
+        <div class="w-56 p-4 border border-slate-200 flex items-center justify-between bg-white">
+            <button onclick="chargerSemaine(${offsetPage - 1})" class="hover:bg-indigo-50 text-indigo-600 p-2 rounded-full transition-colors font-bold">←</button>
+            <span class="text-xs font-black tracking-widest text-black-400">${titre}</span>
+            <button onclick="chargerSemaine(${offsetPage + 1})" class="hover:bg-indigo-50 text-indigo-600 p-2 rounded-full transition-colors font-bold">→</button>
         </div>`;
 
     var jour = new Date(lundiRef);
@@ -79,7 +79,7 @@ function afficherTete(lundiRef, titre) {
         var cle = jour.toISOString().split('T')[0];
 
         header += `
-        <div class="flex-1 p-4 text-center border-r border-gray-400 last:border-r-0"> 
+        <div class="flex-1 p-4 text-center border-r border-gray-400 border border-slate-200 last:border-r-0"> 
             ${jours[i]} ${jour.getDate()} 
             <div class="mt-2 flex flex-col gap-1"> 
                 ${afficherAdmins(cle)} 
@@ -89,21 +89,24 @@ function afficherTete(lundiRef, titre) {
     }
     return header + `</div>`;
 }
-
 function afficherLigne(m, lundiRef) {
-    var ligne = `<div class="flex border-b border-gray-400 h-auto min-h-[70px]">
-        <div class="w-56 p-4 border-r border-gray-400 flex items-center font-bold text-gray-700 text-xs uppercase bg-white">${m.nom}</div>`;
+    var ligne = `<div class="flex border border-slate-200 group">
+        <div class="w-56 p-4 border-r border-slate-200 flex items-center bg-white transition-colors">
+            <div>
+                <div class="text-xs font-bold text-slate-800 uppercase leading-tight">${m.nom}</div>
+            </div>
+        </div>`;
 
     var jour = new Date(lundiRef);
     for (var i = 0; i < 6; i++) {
-    
         var cle = jour.toISOString().split('T')[0];
+
         
-        var bgClass = m.enMaintenance ? "bg-stripes" : (!planningAdmin[cle] ? "bg-gray-200" : "hover:bg-blue-50 cursor-pointer");
-        var clickAction = (planningAdmin[cle] && !m.enMaintenance) ? 'onclick="reserverMachine(${m.id}, \'${cle}\')"' : "";
+        var bgClass = m.enMaintenance ? "bg-stripes" : (!planningAdmin[cle]? "bg-slate-100" : "bg-white hover:bg-indigo-50/30 calendar-case cursor-pointer");
+        var clickAction = (planningAdmin[cle] && !m.enMaintenance) ? `onclick="reserverMachine(${m.id}, '${cle}')"` : "";
 
         ligne += `
-        <div class="flex-1 p-2 border-r border-gray-400 flex flex-col gap-2 ${bgClass}" ${clickAction}>
+        <div class="flex-1 p-2 border-r border-slate-100 last:border-r-0 flex flex-col gap-1.5 min-h-[85px] ${bgClass}" ${clickAction}>
             ${afficherRes(m.id, cle)}
             ${afficherEmprunts(m.id, cle)}
         </div>`;
@@ -111,7 +114,6 @@ function afficherLigne(m, lundiRef) {
     }
     return ligne + "</div>";
 }
-
 function afficherAdmins(cle) {
     if (!planningAdmin[cle]) return '<span class="text-[9px] text-red-400 italic">Fermé</span>';
     var rep = "";
@@ -133,7 +135,7 @@ function afficherRes(mId, dateCle) {
         if (estDansIntervalle(dateCle, r.dateDebut, r.dateFin)) {
             var hover = "cursor-default";
             if (r.idUser == <?php echo valider("idUser", "SESSION") ?>) {
-                hover = "hover:bg-indigo-600 cursor-pointer";
+                hover = "hover:bg-indigo-700 cursor-pointer";
             }
 
             var texte = "";
@@ -151,8 +153,8 @@ function afficherRes(mId, dateCle) {
             }
 
             rep += `
-            <div class="bg-indigo-500 text-white text-[10px] py-2 px-1 rounded shadow-sm ${hover} text-center mb-1">
-                ${texte}
+            <div class="bg-indigo-600 text-white text-[9px] font-bold py-1.5 px-2 rounded-lg shadow-sm ${hover} flex items-center justify-center">
+                <span>${texte}</span>
             </div>`;
         }
     }
@@ -184,7 +186,7 @@ function afficherEmprunts(mId, dateCle) {
             }
 
             rep += `
-            <div class="bg-green-500 text-white text-[10px] py-2 px-1 rounded shadow-sm ${hover} text-center mb-1">
+            <div class="bg-green-500  text-white text-[9px] font-bold py-1.5 px-2 rounded-lg shadow-sm ${hover} flex items-center justify-center">
                 ${texte}
             </div>`;
         }
@@ -240,7 +242,8 @@ $(document).ready(function() {
 </script>
 
 
-<div id="calendrier-container" class="max-w-full bg-white border border-gray-400 rounded-lg shadow-sm overflow-hidden font-sans select-none">
+<div id="calendrier-container" class="max-w-full bg-whiterounded-lg shadow-sm overflow-hidden font-sans select-none my-18">
+    <!-- Le calendrier sera chargé ici -->
 </div>
 
 
