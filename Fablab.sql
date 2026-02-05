@@ -15,7 +15,7 @@ CREATE TABLE Equipement (
     type VARCHAR(255) NOT NULL,
     enMaintenance TINYINT(1) NOT NULL DEFAULT 0,
     description VARCHAR(255) NOT NULL,
-    risque VARCHAR(255) NOT NULL
+    risque VARCHAR(255)
 );
 
 CREATE TABLE Reservation (

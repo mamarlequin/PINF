@@ -11,6 +11,10 @@ include_once("libs/modele.php");
 
 securiser("login");
 
+if(!isset($_SESSION["idUser"])){
+    header("Location:../index.php?view=login");
+    die("");
+}
 
 if (!isAdmin($_SESSION["idUser"])) {
     header("Location:index.php?view=main&msg=AccesRefuse");

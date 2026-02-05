@@ -4,6 +4,10 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
     die("");
 }
 
+if(!isset($_SESSION["idUser"])){
+    header("Location:../index.php?view=login");
+    die("");
+}
 
 $nom = $_SESSION["nom"];
 $prenom = $_SESSION["prenom"];

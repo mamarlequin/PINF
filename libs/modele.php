@@ -63,6 +63,11 @@ function lister_machine(){
 }
 
 function creer_equip($nom, $type, $description, $risque){
+	if(isset($risque)) {
+		$risque = addslashes($risque);
+	} else {
+		$risque = null;
+	}
 	$SQL = "INSERT INTO Equipement (nom, type, enMaintenance, description, risque) VALUES ('$nom', '$type', 0, '$description', '$risque')";
 	SQLInsert($SQL);
 }

@@ -4,6 +4,11 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 	header("Location:../index.php?view=reserver");
 	die("");
 }
+
+if(!isset($_SESSION["idUser"])){
+    header("Location:../index.php?view=login");
+    die("");
+}
 ?>
 
 
@@ -12,6 +17,7 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 var planningAdmin = {};
 var planningReservations = {};
 var machines = [];
+var $popup;
 
 var offsetPage = 0;
 
@@ -102,11 +108,11 @@ function afficherLigne(m, lundiRef) {
         var cle = jour.toISOString().split('T')[0];
 
         
-        var bgClass = m.enMaintenance ? "bg-stripes" : (!planningAdmin[cle]? "bg-slate-100" : "bg-white hover:bg-indigo-50/30 calendar-case cursor-pointer");
-        var clickAction = (planningAdmin[cle] && !m.enMaintenance) ? `onclick="reserverMachine(${m.id}, '${cle}')"` : "";
+        var bgClass = m.enMaintenance ? "bg-stripes" : (!planningAdmin[cle]? "bg-slate-200/50" : "bg-white hover:bg-indigo-100/50 calendar-case cursor-pointer");
+        var clickAction = (planningAdmin[cle] && !m.enMaintenance) ? `onclick="reserverMachine(${m.id}, '${cle}',event)" ` : "";
 
         ligne += `
-        <div class="flex-1 p-2 border-r border-slate-100 last:border-r-0 flex flex-col gap-1.5 min-h-[85px] ${bgClass}" ${clickAction}>
+        <div data-nom="${m.nom}" class="flex-1 p-2 border-r border-slate-100 last:border-r-0 flex flex-col gap-1.5 min-h-[85px] ${bgClass}" ${clickAction}>
             ${afficherRes(m.id, cle)}
             ${afficherEmprunts(m.id, cle)}
         </div>`;
@@ -194,41 +200,52 @@ function afficherEmprunts(mId, dateCle) {
     return rep;
 }
 
+function reserverMachine(id, date, e) {
+    e.stopPropagation();
 
+    $("#debut").val("");
+    $("#fin").val("");
+    $("#form-machine").val(id);
+    $("#form-date").val(date);
+    
+    var nom = $(e.currentTarget).attr("data-nom");
+    $("#info-res").text((nom ? nom : "Machine " + id) + " le " + date);
+
+    $popup.removeClass("hidden"); 
+
+    var popupHeight = $popup.outerHeight();
+    var popupWidth = $popup.outerWidth();
+
+    var left = e.pageX + 20;
+
+    var top = e.pageY + 10;
+
+    if ((top + popupHeight) - ($(window).scrollTop() + $(window).height()) > 0) {
+        top = top - ((top + popupHeight) - ($(window).scrollTop() + $(window).height())) - 10;
+    }
+
+    if (left < 10) left = 10;
+
+    $popup.css({ 
+        top: top + "px", 
+        left: left + "px" 
+    });
+}
 
 $(document).ready(function() {
-    const $popup = $("#pop-reservation");
-    var caseCliquee = null;
+    $(document).on("keydown", function(e) {
+        if (e.key === "Escape") {
+            $popup.addClass("hidden");
+            caseCliquee = null;
+        }
+    });
+
+
+    $popup = $("#pop-reservation");
 
     chargerSemaine(0);
 
-    $(".case-libre").on("click", function(e) {
-
-        e.stopPropagation();
-
-        if(caseCliquee == this){
-            return;
-        }
-
-        caseCliquee = this;
-
-        $("#debut").val("");
-        $("#fin").val("");
-
-        
-
-        const idMachine = $(this).data("machine");
-        const date = $(this).data("date");
-
-        $("#form-machine").val(idMachine);
-        $("#form-date").val(date);
-        $("#info-res").text("Machine " + idMachine + " le " + date);
-
-        $popup.css({
-            top: e.pageY + 10 + "px",
-            left: e.pageX + 10 + "px"
-        }).removeClass("hidden");
-    });
+    
 
     $popup.on("click", function(e) {
         e.stopPropagation();

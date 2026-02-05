@@ -88,7 +88,7 @@ if ($action = valider("action")) {
 			$type = valider("type");
 			$description = valider("description");
 			$risque = valider("risques");
-			if ($nom && $type && $description && $risque && isAdmin($_SESSION["idUser"])) {
+			if ($nom && $type && $description && isAdmin($_SESSION["idUser"])) {
 				creer_equip($nom, $type, $description, $risque);
 				$qs = array("view" => "machines", "msg" => "Création réussie");
 			} else $qs = array("view" => "machines", "msg" => "Création échouée");

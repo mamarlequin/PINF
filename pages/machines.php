@@ -4,6 +4,11 @@ if (basename($_SERVER["PHP_SELF"]) != "index.php") {
 	header("Location:../index.php?view=machines");
 	die("");
 }
+
+if(!isset($_SESSION["idUser"])){
+    header("Location:../index.php?view=login");
+    die("");
+}
 ?>
 <div class="flex items-center mb-6">
 <button id='add_form' class='bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all mr-2 shadow-sm active:scale-95' onclick='afficher_form()'>+</button>
@@ -64,9 +69,13 @@ foreach($machines as $machine){
     <div class="flex justify-between items-start mb-4">
         <div>
             <h3 class="text-2xl font-bold text-indigo-600 mb-2"><?= $machine["nom"] ?></h3>
-            <span class="text-sm font-medium px-2.5 py-0.5 rounded-full <?= $isMaintenance ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' ?>">
-                <?= $isMaintenance ? 'EN MAINTENANCE' : 'OPÉRATIONNELLE' ?>
-            </span>
+            <?php
+            if($isMaintenance){
+                ?>
+                <span class="text-sm font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-700">
+                EN MAINTENANCE
+                </span>
+            <?php } ?>
         </div>
 
         <?php if (isAdmin($_SESSION["idUser"])): ?>
@@ -84,9 +93,7 @@ foreach($machines as $machine){
         <p class="text-slate-700 mb-4"><?= $machine["description"] ?></p>
         
         <?php if (!empty($machine["risque"])): ?>
-            <div class="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-xl border border-red-100">
-                <span class="text-sm font-bold uppercase tracking-wide">Risque : <?= $machine["risque"] ?></span>
-            </div>
+            <span class="text-sm font-bold uppercase text-red-600 tracking-wide">Risque : <?= $machine["risque"] ?></span>
         <?php endif; ?>
     </div>
 
@@ -101,8 +108,8 @@ foreach($machines as $machine){
                 <input type='hidden' name='dest' value='machines'>
                 <input type='hidden' name='id_equip' value='<?=$machine['id']?>'>
                 <input type='hidden' name='etat_actuel' value='<?=$machine['enMaintenance']?>'>
-                <button type='submit' name='action' value='Changer Maintenance' class='w-full text-white px-5 py-2  rounded-xl font-medium transition-colors <?=$isMaintenance ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'?>'>
-                    <?= $isMaintenance ? 'Réparé' : 'Maintenance' ?>
+                <button type='submit' name='action' value='Changer Maintenance' class='w-full text-white px-5 py-2  rounded-xl font-medium transition-colors <?=!$isMaintenance ? 'bg-orange-500 hover:bg-orange-600' : 'bg-indigo-600 hover:bg-indigo-700'?>'>
+                    <?= $isMaintenance ? 'Afficher comme fonctionnel' : 'Afficher comme en maintenance' ?>
                 </button>
             </form>
         <?php endif; ?>
