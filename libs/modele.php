@@ -243,4 +243,35 @@ function ajouter_commentaire($idEquip, $idUser, $texte) {
     return SQLInsert($SQL);
 }
 
+function lister_com($idMachine){
+
+
+$idMachine = (int)$idMachine;
+
+$SQL = "
+SELECT 
+    Utilisateur.prenom,
+    Utilisateur.nom,
+    Commentaire.*,
+    Reservation.dateDebut
+FROM Commentaire
+JOIN Utilisateur ON Commentaire.idUser = Utilisateur.id
+JOIN Reservation ON Commentaire.idReservation = Reservation.id
+WHERE Commentaire.idEquipement = $idMachine
+";
+
+	return parcoursRs(SQLSelect($SQL));
+}
+
+function marquer_resolu($id){
+    $SQL = "UPDATE Commentaire SET resolu=1 WHERE id=$id";
+    return SQLUpdate($SQL);
+}
+
+function marquer_non_resolu($id){
+    $SQL = "UPDATE Commentaire SET resolu=0 WHERE id=$id";
+    return SQLUpdate($SQL);
+}
+
+
 ?>

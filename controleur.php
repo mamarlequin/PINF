@@ -117,6 +117,22 @@ if ($action = valider("action")) {
 				$qs = array("view" => "admin", "msg" => "Disponibilité enregistrée !");
 			}
 			break;
+		
+		case 'Marquer comme résolu' : 
+			$id = valider("id");
+			if ($id){
+				marquer_resolu($id);
+				$qs = array("view" => "machines", "msg" => "Commentaire mis à jour !");
+			}
+			break;
+		
+		case 'Marquer comme non résolu' : 
+			$id = valider("id");
+			if ($id){
+				marquer_non_resolu($id);
+				$qs = array("view" => "machines", "msg" => "Commentaire mis à jour !");
+			}
+			break;
 
 		case 'Créer Utilisateur':
 			$nom = valider("nom");

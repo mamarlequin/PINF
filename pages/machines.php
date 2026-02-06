@@ -99,9 +99,11 @@ foreach($machines as $machine){
 
     <div class="flex flex-wrap gap-3 items-center border-t border-slate-100 pt-4">
         
-        <button class='add_form flex-1 sm:flex-none bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-700 transition-all font-medium' data-id='<?=$machine["id"]?>'>
+        <button class='add_form flex-1 sm:flex-none bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-700 transition-all font-medium' data-id='<?=$machine["id"]?>' onclick='afficher_com(<?=$machine["id"]?>)'>
             Voir les commentaires
         </button>
+
+		
 
         <?php if (isAdmin($_SESSION["idUser"])): ?>
             <form action='controleur.php' method='POST' class="flex-1 sm:flex-none">
@@ -115,13 +117,91 @@ foreach($machines as $machine){
         <?php endif; ?>
 
     </div>
+<div id='com-<?=$machine["id"]?>' style='display:none; position:relative'>
+		<?php
+$commentaires = lister_com($machine['id']) ?? [];
+
+if ($commentaires == []){?>
+	<BR>
+	<p class="text-slate-700 mb-2 italic ">
+        Aucun Commentaire
+    </p><?php
+}
+
+foreach ($commentaires as $commentaire): ?>
+
+<br>
+
+<div class="bg-gray-100 rounded-lg p-4 relative">
+
+    <!-- Nom et prénom -->
+    <div class="flex items-center justify-between">
+        <p class="text-slate-700 font-bold">
+            <?= htmlspecialchars($commentaire["nom"]) ?> - <?= htmlspecialchars($commentaire["prenom"]) ?>
+        </p>
+
+        <!-- Date -->
+        <p class="text-slate-700 italic text-sm">
+            <?= htmlspecialchars($commentaire["dateDebut"]) ?>
+        </p>
+    </div>
+
+    <!-- Statut + Bouton Résolu -->
+    <div class="flex items-center gap-2 mt-2">
+        <?php if ($commentaire["resolu"] == 0): ?>
+            <span class="text-sm font-bold uppercase text-red-600 tracking-wide">
+                NON RESOLU
+            </span>
+            <form method="post" action="controleur.php">
+                <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
+				
+                <input type="submit" value="Marquer comme résolu" name="action"
+                        class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
+                    
+		</input>
+            </form>
+        <?php else: ?>
+            <span class="text-sm font-bold uppercase text-green-600 tracking-wide">
+                RESOLU
+            </span>
+			<form method="post" action="controleur.php">
+                <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
+				
+                <input type="submit" value="Marquer comme non résolu" name="action"
+                        class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
+                    
+				</input>
+            </form>
+        <?php endif; ?>
+    </div>
+
+    <!-- Contenu du commentaire -->
+    <p class="mt-2 text-sm text-slate-600 tracking-wide">
+        <?= htmlspecialchars($commentaire["contenu"]) ?>
+    </p>
+
 </div>
+<?php endforeach; ?>
+
+
+</div>
+
+</div>
+
 
 <?php } ?>
 
 <script>
 function afficher_form() {
     $("#hid").slideToggle(500);
+}
+
+function afficher_com(id){
+	
+	if ($("#com-" + id).css("display") === "block") {
+		$("#com-" + id).css("display", "none");
+	}else  $("#com-" + id).css("display", "block");
+
 }
 
 $(document).ready(function(){

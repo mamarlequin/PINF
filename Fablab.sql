@@ -52,6 +52,7 @@ CREATE TABLE Commentaire (
     idEquipement INT UNSIGNED NOT NULL,
     idUser INT UNSIGNED NOT NULL,
     idReservation INT UNSIGNED NULL,
+    contenu VARCHAR(255) NOT NULL,
     resolu TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT commentaire_idequipement_fk
         FOREIGN KEY (idEquipement) REFERENCES Equipement(id)
@@ -63,6 +64,16 @@ CREATE TABLE Commentaire (
         FOREIGN KEY (idReservation) REFERENCES Reservation(id)
         ON DELETE SET NULL
 );
+
+CREATE TABLE Notification (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    idUser INT UNSIGNED NOT NULL,
+    contenu VARCHAR(255) NOT NULL,
+    CONSTRAINT notification_idUser_fk
+        FOREIGN KEY (idUser) REFERENCES Utilisateur(id)
+        ON DELETE CASCADE
+);
+
 
 CREATE TABLE Creneau (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
