@@ -57,6 +57,29 @@ function isAdmin($idUser)
 	}
 }
 
+function isSuperAdmin($idUser){
+	// Vérifie si l'utilisateur est un super administrateur
+	global $BDD_host;
+	global $BDD_base;
+	global $BDD_user;
+	global $BDD_password;
+
+	try {
+		$dbh = new PDO("mysql:host=$BDD_host;dbname=$BDD_base", $BDD_user, $BDD_password);
+		$dbh->exec("SET CHARACTER SET utf8");
+
+		// Utilisation d'une requête préparée pour éviter les injections SQL
+		$sql = "SELECT id FROM Utilisateur WHERE id = ? AND (role = '2')";
+		$stmt = $dbh->prepare($sql);
+		$stmt->execute([$idUser]);
+
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		return $result ? $result['id'] : false;
+	} catch (PDOException $e) {
+		die("<font color=\"red\">isSuperAdmin: Erreur de connexion : " . $e->getMessage() . "</font>");
+	}
+}
+
 function lister_machine(){
 	$SQL = "SELECT * FROM Equipement";
 	return parcoursRs(SQLSelect($SQL));

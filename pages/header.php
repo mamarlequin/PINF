@@ -57,8 +57,8 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
                 ?>
                     <?php if (isAdmin($_SESSION["idUser"])) { ?>
                         <a href="index.php?view=admin" class="transition-colors hover:text-indigo-600">Administration</a>
-                        <!-- <?php //if (isSuperAdmin($_SESSION["idUser"])) 
-                        { ?> TODO le rajouter des que lara la fait -->
+                        <?php if (isSuperAdmin($_SESSION["idUser"])) 
+                        { ?> 
                             <a href="index.php?view=superadmin" class="transition-colors hover:text-indigo-600">Super Administration</a>
                         <?php } ?>
                     <?php } ?>
@@ -83,7 +83,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
                 ?>
             </div>
         </div>
-        
+
         <!-- Menu mobile -->
         <div id="mobileMenu" class="hidden md:hidden mt-4 bg-slate-300 rounded-2xl shadow-md px-6 py-4 flex flex-col gap-4">
             <a href="./pages/reserver.php" class="lien-protege transition-colors hover:text-indigo-600">Réserver</a>
@@ -91,8 +91,8 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
             <?php if (valider("connecte", "SESSION")) { ?>
                 <?php if (isAdmin($_SESSION["idUser"])) { ?>
                     <a href="index.php?view=admin" class="transition-colors hover:text-indigo-600">Administration</a>
-                    <!-- <?php //if (isSuperAdmin($_SESSION["idUser"])) 
-                    { ?> TODO le rajouter des que lara la fait -->
+                    <?php if (isSuperAdmin($_SESSION["idUser"])) 
+                    { ?>
                         <a href="index.php?view=superadmin" class="transition-colors hover:text-indigo-600">Super Administration</a>
                     <?php } ?>
                 <?php } ?>
