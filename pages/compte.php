@@ -15,6 +15,7 @@ $idUser = $_SESSION["idUser"];
 
 
 $estAdmin = isAdmin($idUser);
+$estSuperAdmin = isSuperAdmin($idUser);
 ?>
 
 <div class="container mx-auto p-6 max-w-4xl">
@@ -22,7 +23,7 @@ $estAdmin = isAdmin($idUser);
         <div>
             <h1 class="text-3xl font-bold text-gray-800"><?php echo "$prenom $nom"; ?></h1>
             <p class="text-indigo-600 font-medium">
-                <?php echo ($estAdmin) ? "Administrateur du Fablab" : "Étudiant"; ?>
+                <?php echo ($estSuperAdmin) ? "Super Administrateur du Fablab" : (($estAdmin) ? "Administrateur du Fablab" : "Étudiant"); ?>
             </p>
         </div>
         <a href="controleur.php?action=Logout"
