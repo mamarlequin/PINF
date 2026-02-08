@@ -180,6 +180,8 @@ function lister_res($debut, $fin)
 	return $planning;
 }
 
+
+
 function lister_emprunts($debut, $fin)
 {
     $SQL = "SELECT id, idUser, idEquipement, dateDebut, dateRenduTheorique, dateRenduReel
@@ -261,29 +263,29 @@ function creer_utilisateur($nom, $prenom, $email, $role) {
 
 function ajouter_commentaire($idEquip, $idUser, $texte) {
     $texte = addslashes($texte);
-    $SQL = "INSERT INTO Commentaire (idEquipement, idUser, texte, resolu) 
-            VALUES ('$idEquip', '$idUser', '$texte', 0)";
+
+    $SQL = "INSERT INTO Commentaire (idEquipement, idUser, contenu, resolu, idReservation) 
+            VALUES ('$idEquip', '$idUser', '$texte', 0, NULL)";
+			
     return SQLInsert($SQL);
 }
-
 function lister_com($idMachine){
+    $idMachine = (int)$idMachine;
 
+    $SQL = "
+    SELECT 
+        Utilisateur.prenom,
+        Utilisateur.nom,
+        Commentaire.*,
+        Reservation.dateDebut
+    FROM Commentaire
+    JOIN Utilisateur ON Commentaire.idUser = Utilisateur.id
+    LEFT JOIN Reservation ON Commentaire.idReservation = Reservation.id
+    WHERE Commentaire.idEquipement = $idMachine
+    ORDER BY Commentaire.id DESC
+    ";
 
-$idMachine = (int)$idMachine;
-
-$SQL = "
-SELECT 
-    Utilisateur.prenom,
-    Utilisateur.nom,
-    Commentaire.*,
-    Reservation.dateDebut
-FROM Commentaire
-JOIN Utilisateur ON Commentaire.idUser = Utilisateur.id
-JOIN Reservation ON Commentaire.idReservation = Reservation.id
-WHERE Commentaire.idEquipement = $idMachine
-";
-
-	return parcoursRs(SQLSelect($SQL));
+    return parcoursRs(SQLSelect($SQL));
 }
 
 function marquer_resolu($id){
@@ -291,9 +293,37 @@ function marquer_resolu($id){
     return SQLUpdate($SQL);
 }
 
+function supprimer_commentaire($idCom) {
+    $idCom = (int)$idCom;
+    $SQL = "DELETE FROM Commentaire WHERE id = $idCom";
+    return SQLDelete($SQL); 
+}
+
 function marquer_non_resolu($id){
     $SQL = "UPDATE Commentaire SET resolu=0 WHERE id=$id";
     return SQLUpdate($SQL);
+}
+function getUtilisateursGestion() {
+    $SQL = "SELECT id, nom, prenom, role FROM Utilisateur WHERE role < 2";
+    return SQLSelect($SQL); 
+}
+
+function update_role($idUser, $nouveauRole) {
+    $idUser = intval($idUser);
+    $nouveauRole = intval($nouveauRole);
+    $SQL = "UPDATE Utilisateur SET role = $nouveauRole WHERE id = $idUser";
+    return SQLUpdate($SQL);
+}
+
+
+function deleguerSuperAdmin($idCible, $minutes) {
+    $monId = $_SESSION["idUser"];
+    $dateFin = date("Y-m-d H:i:s", strtotime("+$minutes minutes"));
+
+   
+    SQLUpdate("UPDATE Utilisateur SET role = 2, dateFinRole = '$dateFin' WHERE id = $idCible");
+    
+    SQLUpdate("UPDATE Utilisateur SET role = 1 WHERE id = $monId");
 }
 
 
