@@ -6,46 +6,47 @@ include_once "libs/maLibBootstrap.php";
 include_once "libs/modele.php";
 include_once "libs/maLibForms.php";
 
-
-$sql = "SELECT id FROM Utilisateur WHERE role = 2 AND dateFinRole < NOW()";
+$sql = "SELECT id FROM Utilisateur WHERE role = 2 AND dateFinRole IS NOT NULL AND dateFinRole < NOW()";
 $expire = SQLSelect($sql);
 
 
-if (is_array($expire) && count($expire) > 0) {
-	foreach ($expire as $user) {
-		$idTemp = $user['id'];
+$expireArray = is_object($expire) ? $expire->fetchAll(PDO::FETCH_ASSOC) : $expire;
+if (is_array($expireArray) && count($expireArray) > 0) {
+    foreach ($expireArray as $user) {
+        $idTemp = $user['id'];
+        SQLUpdate("UPDATE Utilisateur SET role = 1, dateFinRole = NULL WHERE id = $idTemp");
+        
+        
+        SQLUpdate("UPDATE Utilisateur SET role = 2 WHERE (id = 1 OR role = 1) AND dateFinRole IS NULL ORDER BY id ASC LIMIT 1");
 
-
-		SQLUpdate("UPDATE Utilisateur SET role = 1, dateFinRole = NULL WHERE id = $idTemp");
-
-
-		SQLUpdate("UPDATE Utilisateur SET role = 2 WHERE role = 1 AND id != $idTemp AND dateFinRole IS NULL LIMIT 1");
-
-
-		$msg = "Votre période de délégation est terminée. Vous êtes redevenu Admin.";
-		SQLInsert("INSERT INTO Notification (idUser, contenu) VALUES ($idTemp, '$msg')");
-	}
+        $msg = "Votre période de délégation est terminée.";
+        SQLInsert("INSERT INTO Notification (idUser, contenu) VALUES ($idTemp, '$msg')");
+    }
 }
 
-// on récupère le paramètre view éventuel 
-$view = valider("view");
 
-// S'il est vide, on charge la vue d'accueil par défaut
+if (isset($_SESSION["idUser"])) {
+    $roleActuel = SQLGetChamp("SELECT role FROM Utilisateur WHERE id=" . intval($_SESSION["idUser"]));
+    $_SESSION["role"] = $roleActuel;
+}
+
+
+$view = valider("view");
 if (!$view) $view = "main";
 
 include("./pages/header.php");
 
-// En fonction de la vue à afficher, on appelle tel ou tel pages
 switch ($view) {
-	case "main":
-		include("./pages/main.php");
-		break;
+    case "main":
+        include("./pages/main.php");
+        break;
 
-	case "superadmin":
-		include("./pages/superadmin.php");
-		break;
+    case "superadmin":
+        include("./pages/superadmin.php");
+        break;
 
-	default: // si le template correspondant à l'argument existe, on l'affiche
-		if (file_exists("pages/$view.php"))
-			include("pages/$view.php");
+    default:
+        if (file_exists("pages/$view.php"))
+            include("pages/$view.php");
 }
+?>

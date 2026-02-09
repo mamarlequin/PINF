@@ -211,8 +211,10 @@ if ($action = valider("action")) {
 				$idCible = valider("idCible");
 				update_role($idCible, 2);
 				update_role($_SESSION["idUser"], 1);
+
 				$_SESSION["role"] = 1;
-				$qs = array("view" => "main", "msg" => "Transfert effectué.");
+
+				$qs = array("view" => "main", "msg" => "Transfert réussi. Vous n'êtes plus SuperAdmin.");
 			}
 			break;
 
@@ -226,10 +228,15 @@ if ($action = valider("action")) {
 			break;
 
 		case 'Delegation':
-			if (isSuperAdmin($_SESSION["idUser"])) {
-				deleguerSuperAdmin(valider("idCible"), valider("duree"));
-				$_SESSION["role"] = 1;
-				$qs = array("view" => "main", "msg" => "Délégation active.");
+			$idCible = valider("idCible");
+			$dateFin = valider("dateFinLabel");
+
+			if (isSuperAdmin($_SESSION["idUser"]) && $idCible && $dateFin) {
+
+				deleguerSuperAdmin($idCible, $dateFin);
+
+				header("Location: index.php?view=main&msg=Delegation_reussie");
+				exit();
 			}
 			break;
 		case 'Modifier Dispo':
