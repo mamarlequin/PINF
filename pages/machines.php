@@ -170,11 +170,11 @@ foreach ($machines as $machine) {
                             </span>
                             <form method="post" action="controleur.php">
                                 <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
-
+								<?php if (isAdmin($_SESSION["idUser"])){ ?>
                                 <input type="submit" value="Marquer comme résolu" name="action"
                                     class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
-
                                 </input>
+								<?php } ?>
                             </form>
                         <?php else: ?>
                             <span class="text-sm font-bold uppercase text-green-600 tracking-wide">
@@ -182,11 +182,12 @@ foreach ($machines as $machine) {
                             </span>
                             <form method="post" action="controleur.php">
                                 <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
-
+								<?php if (isAdmin($_SESSION["idUser"])){ ?>
                                 <input type="submit" value="Marquer comme non résolu" name="action"
                                     class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
 
                                 </input>
+								<?php } ?>
                             </form>
                         <?php endif; ?>
                     </div>

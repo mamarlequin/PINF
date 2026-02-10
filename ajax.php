@@ -42,8 +42,19 @@ switch($action) {
         $id = valider("id");
         echo json_encode(listercom($id));
 
+    case "search_user":
+        $mot = valider("mot");
+        echo json_encode(recherche_user($mot)); 
+        break;
+
+    case "disparaitre_user":
+        $mot = valider("mot");
+        echo json_encode(disparait_user($mot));
+        break;
+
         
     default:
         http_response_code(400);
         echo json_encode(["error" => "Action inconnue"]);
 }
+

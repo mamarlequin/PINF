@@ -350,3 +350,17 @@ function deleguerSuperAdmin($idCible, $dateFin)
 
     $_SESSION["role"] = 1;
 }
+
+function recherche_user($mot)
+{
+	//AND prenom NOT LIKE '%" . $mot . "%'
+	$SQL = "SELECT * FROM Utilisateur WHERE nom NOT LIKE '%" . $mot . "%' ";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+function disparait_user($mot)
+{
+	//OR prenom LIKE '%" . $mot . "%'
+	$SQL = "SELECT * FROM Equipement WHERE nom LIKE '%" . $mot . "%' ";
+	return parcoursRs(SQLSelect($SQL));
+}

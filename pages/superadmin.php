@@ -12,7 +12,28 @@ if (!$utilisateurs) {
     $utilisateurs = array();
 }
 ?>
+<div class="flex items-center mb-6">
 
+    <input
+        id="rechercheUser"
+        type="text"
+        name="recherche"
+        placeholder="Recherchez un utilisateur..."
+        class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+
+    <button
+        class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
+        <svg
+            class="w-4 h-4 text-gray-600"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+            <line x1="16.65" y1="16.65" x2="22" y2="22"
+                stroke="currentColor" stroke-width="2" />
+        </svg>
+    </button>
+</div>
 <div class="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-sm border">
     <h1 class="text-2xl font-bold text-indigo-900 mb-6">Gestion des privilèges (Super Administration)</h1>
 
@@ -28,7 +49,8 @@ if (!$utilisateurs) {
         <tbody>
             <?php if (is_array($utilisateurs) && count($utilisateurs) > 0): ?>
                 <?php foreach($utilisateurs as $u): ?>
-                    <tr class="border-b hover:bg-slate-50 transition-colors">
+                    
+                    <tr id="<?= $u["id"] ?>" class="border-b hover:bg-slate-50 transition-colors">
                         <td class="py-4 px-2 font-medium"><?= $u['prenom'] ?> <?= $u['nom'] ?></td>
                         <td class="py-4 px-2">
                             <span class="px-2 py-1 rounded-full text-xs <?= $u['role'] == 1 ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700' ?>">
@@ -84,7 +106,7 @@ if (!$utilisateurs) {
                                     </div>
                                 </form>
                             <?php else: ?>
-                                <span class="text-xs text-slate-400 italic">Devenez Admin pour déléguer</span>
+                                <span class="text-xs text-slate-400 italic">Il doit être Admin pour lui déléguer</span>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -97,3 +119,48 @@ if (!$utilisateurs) {
         </tbody>
     </table>
 </div>
+
+<script>
+      $(document).ready(function() {
+        $("#rechercheUser").on("keyup", function() {
+            var titre = $(this).val() || "";
+
+            $.ajax({
+                type: "GET",
+                url: "ajax.php",
+                data: {
+                    "action": "disparaitre_user",
+                    "mot": titre
+                },
+                dataType: "json",
+                success: function(oRep) {
+                    oRep.forEach(element => {
+                        $("#" + element.id).css("display", "block");
+                    });
+                },
+                error: function() {
+                    console.log("Erreur lors de la récupération des machines");
+                },
+            });
+
+
+            $.ajax({
+                type: "GET",
+                url: "ajax.php",
+                data: {
+                    "action": "search_user",
+                    "mot": titre
+                },
+                dataType: "json",
+                success: function(oRep) {
+                    oRep.forEach(element => {
+                        $("#" + element.id).css("display", "none");
+                    });
+                },
+                error: function() {
+                    console.log("Erreur lors de la récupération des machines");
+                },
+            });
+        })
+    });
+</script>
