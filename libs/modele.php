@@ -395,3 +395,8 @@ function recherche_user($mot)
     return parcoursRs(SQLSelect($SQL));
 }
 
+function lister_reserv(){
+	$SQL = "SELECT id, idEquipement FROM Reservation";
+	return parcoursRs(SQLSelect($SQL));
+}
+

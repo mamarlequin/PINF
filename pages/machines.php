@@ -9,6 +9,8 @@ if (!isset($_SESSION["idUser"])) {
     header("Location:../index.php?view=login");
     die("");
 }
+
+// RECHERCHE
 ?>
 <div class="flex items-center mb-6">
     <button id='add_form' class='bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all mr-2 shadow-sm active:scale-95' onclick='afficher_form()'>+</button>
@@ -31,11 +33,35 @@ if (!isset($_SESSION["idUser"])) {
                 stroke="currentColor" stroke-width="2" />
         </svg>
     </button>
+	<?php if (isAdmin($_SESSION["idUser"])): ?>
+	<?php 
+		$machines_nb = lister_machine();
+		$reserv_nb = lister_reserv();
+	?>
+            <button class='bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all mr-2 shadow-sm active:scale-95' onclick='afficher_stat(<?= json_encode($machines_nb, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>, <?= json_encode($reserv_nb, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>)'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Axe horizontal -->
+  <line x1="3" y1="21" x2="21" y2="21"/>
+  <!-- Axe vertical -->
+  <line x1="3" y1="3" x2="3" y2="21"/>
+  <!-- Barres du graphique -->
+  <rect x="6" y="14" width="3" height="7"/>
+  <rect x="11" y="9" width="3" height="12"/>
+  <rect x="16" y="5" width="3" height="16"/>
+</svg>
+            </button>
+			<?php endif; ?>
 </div>
 <div id="resultats"></div>
 
 
+
+<div id="stat-" style='display:none;'>
+	<canvas id="myChart" width="500" height="300"></canvas>
+</div>
+
 <?php
+// FORM NOUVEL EQUIPEMENT 
 if (isAdmin($_SESSION["idUser"])) {
     echo "<div id='hid' class=groupe1 style='display:none;'>";
     mkForm("controleur.php");
@@ -58,6 +84,7 @@ if (isAdmin($_SESSION["idUser"])) {
 $machines = lister_machine() ?: [];
 foreach ($machines as $machine) {
     $isMaintenance = ($machine["enMaintenance"] == 1);
+	//AFFICHAGE MACHINE
 ?>
 
     <div id="<?= $machine["id"] ?>" class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow relative">
@@ -116,6 +143,7 @@ foreach ($machines as $machine) {
                 </form>
             <?php endif; ?>
 
+
         </div>
 
         <div id='add-com-<?= $machine["id"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
@@ -131,7 +159,7 @@ foreach ($machines as $machine) {
         </div>
 
         <div id='com-<?= $machine["id"] ?>' style='display:none; position:relative'>
-            <?php
+            <?php //GESTION COMMENTAIRES
             $commentaires = lister_com($machine['id']) ?? [];
 
             if ($commentaires == []) { ?>
@@ -207,76 +235,9 @@ foreach ($machines as $machine) {
 
     </div>
 
-<div id='com-<?=$machine["id"]?>' style='display:none; position:relative'>
-		<?php
-$commentaires = lister_com($machine['id']) ?? [];
-
-if ($commentaires == []){?>
-	<BR>
-	<p class="text-slate-700 mb-2 italic ">
-        Aucun Commentaire
-    </p><?php
-}
-
-foreach ($commentaires as $commentaire): ?>
-
-<br>
-
-<div class="bg-gray-100 rounded-lg p-4 relative">
-
-    <!-- Nom et prénom -->
-    <div class="flex items-center justify-between">
-        <p class="text-slate-700 font-bold">
-            <?= htmlspecialchars($commentaire["nom"]) ?> - <?= htmlspecialchars($commentaire["prenom"]) ?>
-        </p>
-
-        <!-- Date -->
-        <p class="text-slate-700 italic text-sm">
-            <?= htmlspecialchars($commentaire["dateDebut"]) ?>
-        </p>
-    </div>
-
-    <!-- Statut + Bouton Résolu -->
-    <div class="flex items-center gap-2 mt-2">
-        <?php if ($commentaire["resolu"] == 0){ ?>
-            <span class="text-sm font-bold uppercase text-red-600 tracking-wide">
-                NON RESOLU
-            </span>
-            <form method="post" action="controleur.php">
-                <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
-				<?php if(isAdmin($_SESSION["idUser"])){ ?>
-                <input type="submit" value="Marquer comme résolu" name="action"
-                        class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
-                    
-		</input>
-		<?php } ?>
-            </form>
-        <?php }else{ ?>
-            <span class="text-sm font-bold uppercase text-green-600 tracking-wide">
-                RESOLU
-            </span>
-			<form method="post" action="controleur.php">
-                <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
-				<?php if(isAdmin($_SESSION["idUser"])){ ?>
-                <input type="submit" value="Marquer comme non résolu" name="action"
-                        class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
-                    
-				</input>
-				<?php } ?>
-            </form>
-        <?php } ?>
-    </div>
-
-    <!-- Contenu du commentaire -->
-    <p class="mt-2 text-sm text-slate-600 tracking-wide">
-        <?= htmlspecialchars($commentaire["contenu"]) ?>
-    </p>
-
 </div>
-<?php endforeach; ?>
 
 
-</div>
 
 </div>
 
@@ -284,10 +245,54 @@ foreach ($commentaires as $commentaire): ?>
 
 <?php } ?>
 
+
 <script>
     function afficher_form() {
         $("#hid").slideToggle(500);
     }
+
+	function afficher_stat(machines, reservations){
+		$("#stat-").slideToggle(500);
+		    var myContext = document.getElementById("myChart");
+			labels = [];
+			datas = [];
+			let i = 0;
+			machines.forEach(element => {
+					labels.push(element.nom); 
+					reservations.forEach(reserv => {
+						if(reserv.idEquipement == element.id){
+							i++;
+						}
+					});
+					datas.push(i);
+					i=0;
+				});
+				console.log(labels);
+    var myChartConfig = {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+			{
+				label: "Nombre de réservations",
+				data: datas,
+				backgroundColor: 'rgba(44, 76, 184, 0.5)',
+				borderColor: 'rgb(97, 75, 192)',
+                borderWidth: 1
+			}
+				]},
+				scales: {
+    y: {
+        beginAtZero: true,   // commence à 0
+        ticks: {
+            stepSize: 1      // intervalle entre les graduations
+        }
+    }
+      }
+    }
+  var myChart = new Chart(myContext, myChartConfig);
+
+	}
 
     function afficher_com(id) {
         $("#com-" + id).slideToggle(300);
