@@ -55,15 +55,10 @@ if (!isset($_SESSION["idUser"])) {
 <div id="resultats"></div>
 
 
-
-<div id="stat-" style='display:none;'>
-	<canvas id="myChart" width="500" height="300"></canvas>
-</div>
-
 <?php
 // FORM NOUVEL EQUIPEMENT 
 if (isAdmin($_SESSION["idUser"])) {
-    echo "<div id='hid' class=groupe1 style='display:none;'>";
+    echo "<div id='hid' class='groupe1 bg-white' style='display:none;'>";
     mkForm("controleur.php");
 
     echo "Entrez le nom du nouvel équipement : ";
@@ -81,6 +76,12 @@ if (isAdmin($_SESSION["idUser"])) {
     echo "</div>";
     endForm();
 }
+?>
+<div class="groupe1 bg-white items-center" id="stat-" style='display:none;'>
+	<canvas id="myChart" width="500" height="300"></canvas>
+</div>
+<BR>
+<?php
 $machines = lister_machine() ?: [];
 foreach ($machines as $machine) {
     $isMaintenance = ($machine["enMaintenance"] == 1);
@@ -252,47 +253,57 @@ foreach ($machines as $machine) {
     }
 
 	function afficher_stat(machines, reservations){
-		$("#stat-").slideToggle(500);
-		    var myContext = document.getElementById("myChart");
-			labels = [];
-			datas = [];
-			let i = 0;
-			machines.forEach(element => {
-					labels.push(element.nom); 
-					reservations.forEach(reserv => {
-						if(reserv.idEquipement == element.id){
-							i++;
-						}
-					});
-					datas.push(i);
-					i=0;
-				});
-				console.log(labels);
-    var myChartConfig = {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-			{
-				label: "Nombre de réservations",
-				data: datas,
-				backgroundColor: 'rgba(44, 76, 184, 0.5)',
-				borderColor: 'rgb(97, 75, 192)',
-                borderWidth: 1
-			}
-				]},
-				scales: {
-    y: {
-        beginAtZero: true,   // commence à 0
-        ticks: {
-            stepSize: 1      // intervalle entre les graduations
-        }
-    }
-      }
-    }
-  var myChart = new Chart(myContext, myChartConfig);
+    const statDiv = $("#stat-");
 
-	}
+    // Affiche le div et seulement après on crée le chart
+    statDiv.slideToggle(500, function() {
+        var myContext = document.getElementById("myChart");
+
+        // Supprime un éventuel ancien graphique pour éviter doublons
+        if(window.myChartInstance) {
+            window.myChartInstance.destroy();
+        }
+
+        // Préparer labels et données
+        let labels = [];
+        let datas = [];
+        machines.forEach(element => {
+            labels.push(element.nom); 
+            let count = reservations.filter(r => r.idEquipement == element.id).length;
+            datas.push(count);
+        });
+
+        // Créer le chart
+        const myChartConfig = {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Nombre de réservations",
+                    data: datas,
+                    backgroundColor: 'rgba(44, 76, 184, 0.5)',
+                    borderColor: 'rgb(97, 75, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, 
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        };
+
+        window.myChartInstance = new Chart(myContext, myChartConfig);
+    });
+}
+
 
     function afficher_com(id) {
         $("#com-" + id).slideToggle(300);
