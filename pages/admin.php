@@ -50,10 +50,6 @@ if (!isAdmin($_SESSION["idUser"])) {
 
         <input type="email" name="email" placeholder="Adresse email (pour l'envoi du MDP)" class="w-full border-gray-200 rounded-2xl p-3 focus:ring-indigo-500" required>
 
-        <select name="role" class="w-full border-gray-200 rounded-2xl p-3 focus:ring-indigo-500">
-            <option value="0">Élève</option>
-            <option value="1">Administrateur</option>
-        </select>
 
         <button type="submit" name="action" value="Créer Utilisateur"
             class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg active:scale-95">

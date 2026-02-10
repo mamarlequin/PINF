@@ -117,18 +117,18 @@ if ($action = valider("action")) {
 				$qs = array("view" => "admin", "msg" => "Disponibilité enregistrée !");
 			}
 			break;
-		
-		case 'Marquer comme résolu' : 
+
+		case 'Marquer comme résolu':
 			$id = valider("id");
-			if ($id){
+			if ($id) {
 				marquer_resolu($id);
 				$qs = array("view" => "machines", "msg" => "Commentaire mis à jour !");
 			}
 			break;
-		
-		case 'Marquer comme non résolu' : 
+
+		case 'Marquer comme non résolu':
 			$id = valider("id");
-			if ($id){
+			if ($id) {
 				marquer_non_resolu($id);
 				$qs = array("view" => "machines", "msg" => "Commentaire mis à jour !");
 			}
@@ -140,6 +140,10 @@ if ($action = valider("action")) {
 			$email = valider("email");
 			$role = valider("role");
 
+
+			if ($role === false || $role === "") $role = 0;
+			else $role = (int)$role;
+
 			if ($nom && $prenom && $email) {
 				include_once("libs/modele.php");
 
@@ -147,7 +151,6 @@ if ($action = valider("action")) {
 				$mdp = creer_utilisateur($nom, $prenom, $email, $role);
 
 				if ($mdp) {
-					
 					include_once("libs/maLibMail.php");
 					if (envoyerMailMdp($email, $prenom, $mdp)) {
 						$msg = "Succès : Compte créé et mail envoyé à $email !";
@@ -187,6 +190,55 @@ if ($action = valider("action")) {
 			header("Location: index.php?view=machines");
 			break;
 
+		case 'Supprimer Commentaire':
+			$idCom = valider("id");
+			supprimer_commentaire($idCom);
+			header("Location: index.php?view=machines");
+			break;
+
+		case 'Promouvoir Admin':
+			if (isSuperAdmin($_SESSION["idUser"])) {
+				$idCible = valider("idCible");
+				update_role($idCible, 1);
+
+				SQLInsert("INSERT INTO Notification (idUser, contenu) VALUES ($idCible, 'Vous avez été promu Admin')");
+				$qs = array("view" => "superadmin", "msg" => "Utilisateur promu.");
+			}
+			break;
+
+		case 'Transfert SuperAdmin':
+			if (isSuperAdmin($_SESSION["idUser"])) {
+				$idCible = valider("idCible");
+				update_role($idCible, 2);
+				update_role($_SESSION["idUser"], 1);
+
+				$_SESSION["role"] = 1;
+
+				$qs = array("view" => "main", "msg" => "Transfert réussi. Vous n'êtes plus SuperAdmin.");
+			}
+			break;
+
+		case 'Rendre Etudiant':
+			if (isSuperAdmin($_SESSION["idUser"])) {
+				$idCible = valider("idCible");
+				update_role($idCible, 0);
+
+				$qs = array("view" => "superadmin", "msg" => "L'utilisateur est redevenu Étudiant.");
+			}
+			break;
+
+		case 'Delegation':
+			$idCible = valider("idCible");
+			$dateFin = valider("dateFinLabel");
+
+			if (isSuperAdmin($_SESSION["idUser"]) && $idCible && $dateFin) {
+
+				deleguerSuperAdmin($idCible, $dateFin);
+
+				header("Location: index.php?view=main&msg=Delegation_reussie");
+				exit();
+			}
+			break;
 		case 'Modifier Dispo':
 			$idCreneau = valider("id_creneau");
 			$date = valider("date_jour");
@@ -218,14 +270,14 @@ $urlBase = dirname($_SERVER["PHP_SELF"]) . "/index.php";
 // On redirige vers la page index avec les bons arguments
 
 if (empty($qs)) {
-    if (isset($_SERVER["HTTP_REFERER"])) {
-        $referer_queries = parse_url($_SERVER["HTTP_REFERER"], PHP_URL_QUERY);
-        parse_str($referer_queries, $output);
-        $view = isset($output['view']) ? $output['view'] : "main";
-    } else {
-        $view = "main";
-    }
-    $qs = array("view" => $view);
+	if (isset($_SERVER["HTTP_REFERER"])) {
+		$referer_queries = parse_url($_SERVER["HTTP_REFERER"], PHP_URL_QUERY);
+		parse_str($referer_queries, $output);
+		$view = isset($output['view']) ? $output['view'] : "main";
+	} else {
+		$view = "main";
+	}
+	$qs = array("view" => $view);
 }
 
 rediriger($urlBase, $qs);
