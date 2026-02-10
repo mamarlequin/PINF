@@ -351,16 +351,47 @@ function deleguerSuperAdmin($idCible, $dateFin)
     $_SESSION["role"] = 1;
 }
 
-function recherche_user($mot)
-{
-	//AND prenom NOT LIKE '%" . $mot . "%'
-	$SQL = "SELECT * FROM Utilisateur WHERE nom NOT LIKE '%" . $mot . "%' ";
-	return parcoursRs(SQLSelect($SQL));
-}
-
 function disparait_user($mot)
 {
-	//OR prenom LIKE '%" . $mot . "%'
-	$SQL = "SELECT * FROM Equipement WHERE nom LIKE '%" . $mot . "%' ";
-	return parcoursRs(SQLSelect($SQL));
+    $mot = trim($mot);
+    $mots = explode(' ', $mot);
+    $conditions = [];
+	foreach ($mots as $m) {
+
+        // sécurité minimale
+        $m = addslashes($m);
+
+        // condition : le mot est dans nom OU prénom
+        $conditions[] = "(nom NOT LIKE '%$m%' AND prenom NOT LIKE '%$m%')";
+    }
+
+     $SQL = "
+        SELECT id
+        FROM Utilisateur
+        WHERE " . implode(' OR ', $conditions);
+
+    return parcoursRs(SQLSelect($SQL));
 }
+
+function recherche_user($mot)
+{
+	$mot = trim($mot);
+    $mots = explode(' ', $mot);
+    $conditions = [];
+	foreach ($mots as $m) {
+
+        // sécurité minimale
+        $m = addslashes($m);
+
+        // condition : le mot est dans nom OU prénom
+        $conditions[] = "(nom LIKE '%$m%' OR prenom LIKE '%$m%')";
+    }
+
+     $SQL = "
+        SELECT id
+        FROM Utilisateur
+        WHERE " . implode(' AND ', $conditions);
+
+    return parcoursRs(SQLSelect($SQL));
+}
+

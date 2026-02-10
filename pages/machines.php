@@ -99,9 +99,11 @@ foreach ($machines as $machine) {
                 Voir les commentaires
             </button>
 
+			<?php if (isAdmin($_SESSION["idUser"])): ?>
             <button class='flex-1 sm:flex-none bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-700 transition-all font-medium' onclick='afficher_form_com(<?= $machine["id"] ?>)'>
                 + Ajouter un commentaire
             </button>
+			<?php endif; ?>
 
             <?php if (isAdmin($_SESSION["idUser"])): ?>
                 <form action='controleur.php' method='POST' class="flex-1 sm:flex-none">
@@ -154,15 +156,16 @@ foreach ($machines as $machine) {
                             <?= htmlspecialchars($commentaire["dateDebut"] ?? "") ?>
                         </p>
                     </div>
-                    <?php if (isAdmin($_SESSION["idUser"])): ?>
+					<!----
+                    <?php //if (isAdmin($_SESSION["idUser"])): ?>
                         <form action="controleur.php" method="POST" onsubmit="return confirm('Supprimer ce commentaire ?');">
-                            <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
+                            <input type="hidden" name="id" value="<?=  $commentaire['id'] ?>">
                             <button type="submit" name="action" value="Supprimer Commentaire" class="absolute top-1 right-2 text-slate-400 hover:text-red-500 transition-colors font-bold text-xl">
                                 x
                             </button>
                         </form>
-                    <?php endif; ?>
-
+                    <?php // endif; ?>
+					--->
                     <div class="flex items-center gap-2 mt-2">
                         <?php if ($commentaire["resolu"] == 0): ?>
                             <span class="text-sm font-bold uppercase text-red-600 tracking-wide">
@@ -193,7 +196,8 @@ foreach ($machines as $machine) {
                     </div>
 
                     <p class="mt-2 text-sm text-slate-600 tracking-wide">
-                        <?= htmlspecialchars($commentaire["contenu"]) ?>
+                        <?= html_entity_decode($commentaire["contenu"]) ?>
+
                     </p>
 
                 </div>

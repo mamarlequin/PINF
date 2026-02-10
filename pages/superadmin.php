@@ -135,7 +135,9 @@ if (!$utilisateurs) {
                 dataType: "json",
                 success: function(oRep) {
                     oRep.forEach(element => {
-                        $("#" + element.id).css("display", "block");
+                        $("#" + element.id).css("display", "none");
+                        console.log("apparait : : ");
+                        console.log(element.id);
                     });
                 },
                 error: function() {
@@ -154,7 +156,9 @@ if (!$utilisateurs) {
                 dataType: "json",
                 success: function(oRep) {
                     oRep.forEach(element => {
-                        $("#" + element.id).css("display", "none");
+                        $("#" + element.id).css("display", "table-row");
+                        console.log("disparait : ");
+                        console.log(element.id);
                     });
                 },
                 error: function() {
