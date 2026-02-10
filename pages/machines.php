@@ -148,31 +148,33 @@ foreach ($commentaires as $commentaire): ?>
 
     <!-- Statut + Bouton Résolu -->
     <div class="flex items-center gap-2 mt-2">
-        <?php if ($commentaire["resolu"] == 0): ?>
+        <?php if ($commentaire["resolu"] == 0){ ?>
             <span class="text-sm font-bold uppercase text-red-600 tracking-wide">
                 NON RESOLU
             </span>
             <form method="post" action="controleur.php">
                 <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
-				
+				<?php if(isAdmin($_SESSION["idUser"])){ ?>
                 <input type="submit" value="Marquer comme résolu" name="action"
                         class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
                     
 		</input>
+		<?php } ?>
             </form>
-        <?php else: ?>
+        <?php }else{ ?>
             <span class="text-sm font-bold uppercase text-green-600 tracking-wide">
                 RESOLU
             </span>
 			<form method="post" action="controleur.php">
                 <input type="hidden" name="id" value="<?= $commentaire['id'] ?>">
-				
+				<?php if(isAdmin($_SESSION["idUser"])){ ?>
                 <input type="submit" value="Marquer comme non résolu" name="action"
                         class="!text-xs !text-gray-700 !bg-gray-200 hover:bg-gray-300 !px-2 !py-1 !rounded">
                     
 				</input>
+				<?php } ?>
             </form>
-        <?php endif; ?>
+        <?php } ?>
     </div>
 
     <!-- Contenu du commentaire -->
