@@ -41,9 +41,9 @@ switch ($view) {
         include("./pages/main.php");
         break;
 
-    case "superadmin":
-        include("./pages/superadmin.php");
-        break;
+    // case "superadmin":
+    //     include("./pages/superadmin.php");
+    //     break;
 
     default:
         if (file_exists("pages/$view.php"))
