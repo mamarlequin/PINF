@@ -16,9 +16,15 @@ $idUser = $_SESSION["idUser"];
 
 $estAdmin = isAdmin($idUser);
 $estSuperAdmin = isSuperAdmin($idUser);
-?>
+$machine = lister_machine();  
+$reserv = lister_reserv();
+$user = lister_user($idUser);?>
 
 <script>
+const machines = <?php echo json_encode($machine); ?>;
+const reservations = <?php echo json_encode($reserv); ?>;
+const user = <?php echo json_encode($user); ?>;
+
 
     $(document).ready(function () {
         $("#settings").on("click", function () {
@@ -36,19 +42,71 @@ $estSuperAdmin = isSuperAdmin($idUser);
             showSection("calendrier");
         });
 
-        $("#stat").on("click", function () {
-            //$("#statistique").toggleClass("hidden");
-            showSection("statistique");
-        });
+    $("#stat").on("click", function () {
 
-        function showSection(id) {
-            //Ferme toutes les sections
-            $(".section").addClass("hidden");
+        showSection("statistique");
 
-            //Ouvre seulement celle clickée
-            $("#" + id).removeClass("hidden");
+        var myContext = document.getElementById("myChart");
+
+        if(window.myChartInstance) {
+            window.myChartInstance.destroy();
         }
-    })
+
+        let labels = [];
+        let datas = [];
+
+        var barColors = [
+            "rgba(0,0,255,1.0)",
+            "rgba(0,0,255,0.8)",
+            "rgba(0,0,255,0.6)",
+            "rgba(0,0,255,0.4)",
+            "rgba(0,0,255,0.2)",
+        ];
+
+        machines.forEach(machine => {
+
+            labels.push(machine.nom);
+
+            const count = reservations.filter(reservation =>
+                reservation.idEquipement == machine.id &&
+                reservation.idUser == user[0].id
+
+            ).length;
+
+            console.log(user);
+            console.log(machine)
+            console.log(reservations);
+            datas.push(count);
+
+        });
+        console.log(datas)
+
+        const myChartConfig = {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Nombre de réservations",
+                    data: datas,
+                    backgroundColor: barColors
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        };
+
+        window.myChartInstance = new Chart(myContext, myChartConfig);
+
+    });
+
+    function showSection(id) {
+        $(".section").addClass("hidden");
+        $("#" + id).removeClass("hidden");
+    }
+
+});
 
 </script>
 
@@ -93,11 +151,12 @@ $estSuperAdmin = isSuperAdmin($idUser);
 
 
 <!-- Statistiques -->
+
 <!-- Eulalie tu dois mettre ici les stat stp -->
-<div class="section hidden container mx-auto p-6 max-w-4xl" id="statistique">
+<div class="section hidden container mx-auto p-6 max-w-4xl" id="statistique" >
     <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800"> Ici c'est pour Eulalie </h1>
+            <h1 class="text-3xl font-bold text-gray-800 !items-center"> <canvas id="myChart" width="500" height="300"></canvas></h1>
         </div>
     </div>
 </div>

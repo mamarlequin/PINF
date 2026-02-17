@@ -400,3 +400,7 @@ function lister_reserv(){
 	return parcoursRs(SQLSelect($SQL));
 }
 
+function lister_user($id){
+	$SQL = "SELECT * FROM Utilisateur WHERE id = '$id'";
+	return parcoursRs(SQLSelect($SQL));
+}
