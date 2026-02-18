@@ -207,7 +207,9 @@ function reserverMachine(id, date, e) {
     $("#fin").val("");
     $("#form-machine").val(id);
     $("#form-date").val(date);
-    
+
+
+
     var nom = $(e.currentTarget).attr("data-nom");
     $("#info-res").text((nom ? nom : "Machine " + id) + " le " + date);
 
@@ -233,6 +235,9 @@ function reserverMachine(id, date, e) {
 }
 
 $(document).ready(function() {
+
+
+
     $(document).on("keydown", function(e) {
         if (e.key === "Escape") {
             $popup.addClass("hidden");
@@ -240,6 +245,33 @@ $(document).ready(function() {
         }
     });
 
+    
+
+    $("#debut, #fin").on("change",function(e) {
+        var t1 = $("#debut").val();
+        var t2 = $("#fin").val();
+
+        console.log("change");
+
+        if(t2 < t1)
+        {
+            $("#fin").val(t1);
+        }
+
+        date = $("#form-date").val();
+
+        console.log(date);
+
+        $("#debut").attr('min',planningAdmin[date][0]["debut"]);
+        $("#debut").attr('max',planningAdmin[date][0]["fin"]);
+        $("#debut").attr('step', '60'); 
+        
+        console.log(planningAdmin[date][0]["debut"]);
+        console.log(planningAdmin[date][0]["fin"]);
+    });
+
+
+   
 
     $popup = $("#pop-reservation");
 
@@ -256,6 +288,8 @@ $(document).ready(function() {
         caseCliquee = null;
     });
 });
+
+
 </script>
 
 
