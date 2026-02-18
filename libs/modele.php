@@ -404,3 +404,35 @@ function lister_user($id){
 	$SQL = "SELECT * FROM Utilisateur WHERE id = '$id'";
 	return parcoursRs(SQLSelect($SQL));
 }
+
+function verif_reserv($mId,$deb,$fin){
+	$SQL = "SELECT e.id
+			FROM Equipement e
+			WHERE e.id = '$mId'
+			AND e.enMaintenance = 0
+
+			AND NOT EXISTS (
+				SELECT 1 FROM Reservation r 
+				WHERE r.idEquipement = e.id 
+				AND (
+					(r.dateDebut < '$fin' AND r.dateFin > '$deb')
+				)
+			)
+
+			AND EXISTS (
+				SELECT 1 FROM Creneau c
+				WHERE c.dateDebut <= '$deb' 
+				AND c.dateFin >= '$fin'
+			);";
+
+	return parcoursRs(SQLSelect($SQL));
+}
+
+function nouvelle_reserv($idEquipement,$idUser,$dateDebut,$dateFin)
+{
+	$SQL = "INSERT INTO Reservation (idEquipement, idUser, dateDebut, dateFin) 
+            VALUES ($idEquipement, $idUser, '$dateDebut', '$dateFin')";
+
+    return SQLInsert($SQL);
+}
+?>

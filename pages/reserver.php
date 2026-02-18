@@ -250,24 +250,40 @@ $(document).ready(function() {
     $("#debut, #fin").on("change",function(e) {
         var t1 = $("#debut").val();
         var t2 = $("#fin").val();
+        var tmin = "25:00";
+        var tmax = "00:00";
+        
 
-        console.log("change");
-
-        if(t2 < t1)
+        if(t2 != "" && t1 != "" && t2 < t1)
         {
             $("#fin").val(t1);
+            t2 = t1;
         }
 
         date = $("#form-date").val();
-
-        console.log(date);
-
-        $("#debut").attr('min',planningAdmin[date][0]["debut"]);
-        $("#debut").attr('max',planningAdmin[date][0]["fin"]);
-        $("#debut").attr('step', '60'); 
         
-        console.log(planningAdmin[date][0]["debut"]);
-        console.log(planningAdmin[date][0]["fin"]);
+        for (var dates of planningAdmin[date]) {
+            if(dates["debut"] < tmin)
+            {
+                tmin = dates["debut"];
+            }
+            if(dates["fin"] > tmax)
+            {
+                tmax = dates["fin"];
+            }
+        }
+
+        if(t1 != "" && t1 < tmin)
+            $("#debut").val(tmin);
+        
+        if(t2 > tmax)
+            $("#fin").val(tmax);
+        if(t2 != "" && t2 < tmin)
+            $("#fin").val(tmin);
+        
+        if(t1 > tmax)
+            $("#debut").val(tmax);
+
     });
 
 

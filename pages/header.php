@@ -39,6 +39,8 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
 
 <body class="text-slate-800 w mx-20">
 
+
+
     <nav class="max-w-6xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 sticky top-4 mb-6 z-50">
         <div class="bg-white/50 backdrop-blur-md rounded-full border shadow-sm px-6 flex items-center py-2 justify-between h-1-">
             <a href="index.php?view=main" style="margin-right:20px;" class="transition-transform hover:scale-105">
@@ -116,3 +118,16 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
     <script>
         const utilisateurEstConnecte = <?= isset($_SESSION['idUser']) ? 'true' : 'false' ?>;
     </script>
+
+    <?php if ($msg = valider("msg")): ?>
+        <div id="popup-message" 
+            class="w-full flex justify-center p-4 cursor-pointer transition-all duration-500 ease-in-out opacity-100 z-50"
+            onclick="this.classList.add('opacity-0', '-translate-y-2'); setTimeout(() => this.remove(), 500);">
+            
+            <div class="bg-white/20 backdrop-blur-md border border-white/30 text-gray-800 px-8 py-4 rounded-2xl shadow-xl max-w-lg text-center">
+                <span class="text-sm font-semibold tracking-wide">
+                    <?php echo $msg ?>
+                </span>
+            </div>
+        </div>
+    <?php endif; ?>

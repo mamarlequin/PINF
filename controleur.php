@@ -254,6 +254,46 @@ if ($action = valider("action")) {
 			}
 			header("Location: index.php?view=compte");
 			break;
+		case 'reserver':
+			if (isset($_SESSION["idUser"]))
+			{
+				$idUser = $_SESSION["idUser"];
+				$idMachine = valider("id_machine");
+				$date = valider("date_res");
+				$deb = valider("debut");
+				$fin = valider("fin");
+
+				$flag = 1;
+
+				if($deb > $fin)
+				{
+					$qs = array("view" => "reserver", "msg" => "L'heure de début est plus grande que l'heure de fin");
+					break;
+				}
+				
+				foreach(lister_machine() as $machine)
+				{
+					if($machine["id"] == $idMachine)
+						$flag = 0;
+				}
+				
+				if($flag)
+				{
+					$qs = array("view" => "reserver", "msg" => "La machine n'existe pas");
+					break;
+				}
+
+				$check = verif_reserv($idMachine, $date . " " . $deb . ":00", $date . " " . $fin . ":00");
+
+				if (!empty($check)) {
+					nouvelle_reserv($idMachine, $idUser, $date . " " . $deb . ":00", $date . " " . $fin . ":00");
+					$qs = array("view" => "reserver", "msg" => "Réservation réalisée avec succès");
+				} else {
+					$qs = array("view" => "reserver", "msg" => "Réservation impossible");
+				}
+				
+			} 
+			break;
 		case '-':
 			if ($id = valider("id")) {
 				supp_equip($id);
