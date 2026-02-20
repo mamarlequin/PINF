@@ -153,10 +153,10 @@ const user = <?php echo json_encode($user); ?>;
 <!-- Statistiques -->
 
 <!-- Eulalie tu dois mettre ici les stat stp -->
-<div class="section hidden container mx-auto p-6 max-w-4xl" id="statistique" >
-    <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
+<div class="section hidden container mx-auto p-6 max-w-4xl items-center" id="statistique" >
+    <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex  items-center border border-gray-100">
         <div>
-            <h1 class="text-3xl font-bold text-gray-800 !items-center"> <canvas id="myChart" width="500" height="300"></canvas></h1>
+            <div class="text-3xl font-bold text-gray-800 !items-center"> <canvas id="myChart" width="500" height="300"></canvas></div>
         </div>
     </div>
 </div>

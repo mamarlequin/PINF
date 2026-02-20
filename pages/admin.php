@@ -31,41 +31,92 @@ $reserv_nb = lister_reserv();
 
 ?>
 
+<div class="container mx-auto p-6 max-w-4xl">
+    <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
+        <div id="dashboard">
+            <button class="transition-colors hover:text-indigo-600"> Disponibilitées </button>
+        </div>
+        <div id="calendar">
+            <button class="transition-colors hover:text-indigo-600"> Ajouter un membre </button>
+        </div>
+        <div id="stat">
+            <button class="transition-colors hover:text-indigo-600"> Statistiques </button>
+        </div>
+    </div>
+</div>
 
-<div class="bg-white shadow-md rounded-lg p-6 mb-8 mt-10 border-l-4 border-indigo-500 max-w-5xl mx-auto">
-    <h2 class="text-xl font-semibold mb-4 text-indigo-700">Indiquer mes disponibilités</h2>
-    <form action="controleur.php" method="POST" class="flex flex-wrap gap-4 items-end">
+
+<div class="section bg-white rounded-2xl shadow-sm border max-w-6xl mx-auto mt-10 p-6" id="disponibilités">
+    
+    <h1 class="text-2xl font-bold text-indigo-900 mb-6">
+        Indiquer mes disponibilités
+    </h1>
+
+    <form action="controleur.php" method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        
         <div>
-            <label class="block text-sm font-medium text-gray-700">Début</label>
-            <input type="datetime-local" name="debut" class="mt-1 block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+            <label class="block text-sm text-slate-500 mb-2">Début</label>
+            <input type="datetime-local" name="debut"
+                class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                required>
         </div>
+
         <div>
-            <label class="block text-sm font-medium text-gray-700">Fin</label>
-            <input type="datetime-local" name="fin" class="mt-1 block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+            <label class="block text-sm text-slate-500 mb-2">Fin</label>
+            <input type="datetime-local" name="fin"
+                class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                required>
         </div>
-        <input type="submit" name="action" value="Enregistrer Dispo" class="bg-green-600 text-white px-6 py-2 rounded-3xl hover:bg-green-700 transition-all cursor-pointer">
+
+        <div>
+            <input type="submit" name="action" value="Enregistrer"
+                class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition">
+        </div>
+
     </form>
 </div>
-<div class="bg-white shadow-xl rounded-3xl p-8 border border-gray-100 max-w-5xl mx-auto mt-10">
-    <h2 class="text-2xl font-bold text-indigo-600 mb-6 flex items-center">
+<div class="section hidden bg-white rounded-2xl shadow-sm border max-w-6xl mx-auto mt-10 mb-20 p-8" id="Ajouter">
+    
+    <h1 class="text-2xl font-bold text-indigo-900 mb-8">
         Ajouter un membre au Fablab
-    </h2>
+    </h1>
 
-    <form action="controleur.php" method="POST" class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-            <input type="text" name="nom" placeholder="Nom" class="w-full border-gray-200 rounded-2xl p-3 focus:ring-indigo-500" required>
-            <input type="text" name="prenom" placeholder="Prénom" class="w-full border-gray-200 rounded-2xl p-3 focus:ring-indigo-500" required>
+    <form action="controleur.php" method="POST" class="space-y-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+                <label class="block text-sm text-slate-500 mb-2">Nom</label>
+                <input type="text" name="nom"
+                    class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    required>
+            </div>
+
+            <div>
+                <label class="block text-sm text-slate-500 mb-2">Prénom</label>
+                <input type="text" name="prenom"
+                    class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    required>
+            </div>
         </div>
 
-        <input type="email" name="email" placeholder="Adresse email (pour l'envoi du MDP)" class="w-full border-gray-200 rounded-2xl p-3 focus:ring-indigo-500" required>
+        <div>
+            <label class="block text-sm text-slate-500 mb-2">Adresse email</label>
+            <input type="email" name="email"
+                class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                required>
+        </div>
 
+        <div class="pt-4">
+            <button type="submit" name="action" value="Créer Utilisateur"
+                class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition">
+                Créer le compte
+            </button>
+        </div>
 
-        <button type="submit" name="action" value="Créer Utilisateur"
-            class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg active:scale-95">
-            Créer le compte et envoyer les accès
-        </button>
     </form>
 </div>
+
+<div id="statistique" class="section hidden">
 
 <div class="flex items-center mb-6">
 
@@ -134,6 +185,7 @@ $reserv_nb = lister_reserv();
 	<canvas id="myChart" width="500" height="300"></canvas>
 </div>
 <BR>
+</div>
 
 <script>
 
@@ -204,6 +256,28 @@ function afficher_stat(machines, reservations, user){
 
 
       $(document).ready(function() {
+
+        $("#stat").on("click", function () {
+            //$("#param").toggleClass("hidden");
+            showSection("statistique");
+        });
+
+        $("#dashboard").on("click", function () {
+            //$("#tabbord").toggleClass("hidden");
+            showSection("disponibilités");
+        });
+
+        $("#calendar").on("click", function () {
+            //$("#calendrier").toggleClass("hidden");
+            showSection("Ajouter");
+        });
+
+        function showSection(id) {
+        $(".section").addClass("hidden");
+        $("#" + id).removeClass("hidden");
+    }
+
+
         $("#rechercheUser").on("keyup", function() {
             var titre = $(this).val() || "";
 
