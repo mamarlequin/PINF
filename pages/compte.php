@@ -16,14 +16,15 @@ $idUser = $_SESSION["idUser"];
 
 $estAdmin = isAdmin($idUser);
 $estSuperAdmin = isSuperAdmin($idUser);
-$machine = lister_machine();  
+$machine = lister_machine();
 $reserv = lister_reserv();
-$user = lister_user($idUser);?>
+$user = lister_user($idUser);
+?>
 
 <script>
-const machines = <?php echo json_encode($machine); ?>;
-const reservations = <?php echo json_encode($reserv); ?>;
-const user = <?php echo json_encode($user); ?>;
+    const machines = <?php echo json_encode($machine); ?>;
+    const reservations = <?php echo json_encode($reserv); ?>;
+    const user = <?php echo json_encode($user); ?>;
 
 
     $(document).ready(function () {
@@ -35,6 +36,7 @@ const user = <?php echo json_encode($user); ?>;
         $("#dashboard").on("click", function () {
             //$("#tabbord").toggleClass("hidden");
             showSection("tabbord");
+            updateTime();
         });
 
         $("#calendar").on("click", function () {
@@ -42,73 +44,82 @@ const user = <?php echo json_encode($user); ?>;
             showSection("calendrier");
         });
 
-    $("#stat").on("click", function () {
+        $("#stat").on("click", function () {
 
-        showSection("statistique");
+            showSection("statistique");
 
-        var myContext = document.getElementById("myChart");
+            var myContext = document.getElementById("myChart");
 
-        if(window.myChartInstance) {
-            window.myChartInstance.destroy();
-        }
+            if (window.myChartInstance) {
+                window.myChartInstance.destroy();
+            }
 
-        let labels = [];
-        let datas = [];
+            let labels = [];
+            let datas = [];
 
-        var barColors = [
-            "rgba(0,0,255,1.0)",
-            "rgba(0,0,255,0.8)",
-            "rgba(0,0,255,0.6)",
-            "rgba(0,0,255,0.4)",
-            "rgba(0,0,255,0.2)",
-        ];
+            var barColors = [
+                "rgba(0,0,255,1.0)",
+                "rgba(0,0,255,0.8)",
+                "rgba(0,0,255,0.6)",
+                "rgba(0,0,255,0.4)",
+                "rgba(0,0,255,0.2)",
+            ];
 
-        machines.forEach(machine => {
+            machines.forEach(machine => {
 
-            labels.push(machine.nom);
+                labels.push(machine.nom);
 
-            const count = reservations.filter(reservation =>
-                reservation.idEquipement == machine.id &&
-                reservation.idUser == user[0].id
+                const count = reservations.filter(reservation =>
+                    reservation.idEquipement == machine.id &&
+                    reservation.idUser == user[0].id
 
-            ).length;
+                ).length;
 
-            console.log(user);
-            console.log(machine)
-            console.log(reservations);
-            datas.push(count);
+                console.log(user);
+                console.log(machine)
+                console.log(reservations);
+                datas.push(count);
+
+            });
+            console.log(datas)
+
+            const myChartConfig = {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Nombre de réservations",
+                        data: datas,
+                        backgroundColor: barColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            };
+
+            window.myChartInstance = new Chart(myContext, myChartConfig);
 
         });
-        console.log(datas)
 
-        const myChartConfig = {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: "Nombre de réservations",
-                    data: datas,
-                    backgroundColor: barColors
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
+        function showSection(id) {
+            $(".section").addClass("hidden");
+            $("#" + id).removeClass("hidden");
         };
 
-        window.myChartInstance = new Chart(myContext, myChartConfig);
+
+        function updateTime() {
+            var date = new Date();
+            const options = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+            $('#time').html(options);
+        };
+        updateTime();
 
     });
 
-    function showSection(id) {
-        $(".section").addClass("hidden");
-        $("#" + id).removeClass("hidden");
-    }
-
-});
-
 </script>
+
 
 <!-- Bannière -->
 <div class="container mx-auto p-6 max-w-4xl">
@@ -133,9 +144,9 @@ const user = <?php echo json_encode($user); ?>;
 <!-- Tableau de Bord -->
 <div class="section container mx-auto p-6 max-w-4xl" id="tabbord">
     <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-800"><?php echo "Bonjour $prenom $nom"; ?></h1>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-800"><?php echo "Bonjour $prenom $nom"; ?></h1>
+        <!-- La date du jour s'affiche ici -->
+        <div id="time" class="bg-indigo-600 shadow-sm rounded-3xl text-white px-5 py-2 transition-all"></div> 
     </div>
 </div>
 
@@ -151,12 +162,11 @@ const user = <?php echo json_encode($user); ?>;
 
 
 <!-- Statistiques -->
-
-<!-- Eulalie tu dois mettre ici les stat stp -->
-<div class="section hidden container mx-auto p-6 max-w-4xl items-center" id="statistique" >
+<div class="section hidden container mx-auto p-6 max-w-4xl items-center" id="statistique">
     <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex  items-center border border-gray-100">
         <div>
-            <div class="text-3xl font-bold text-gray-800 !items-center"> <canvas id="myChart" width="500" height="300"></canvas></div>
+            <div class="text-3xl font-bold text-gray-800 !items-center"> <canvas id="myChart" width="500"
+                    height="300"></canvas></div>
         </div>
     </div>
 </div>

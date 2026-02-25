@@ -15,8 +15,8 @@ if (is_array($expireArray) && count($expireArray) > 0) {
     foreach ($expireArray as $user) {
         $idTemp = $user['id'];
         SQLUpdate("UPDATE Utilisateur SET role = 1, dateFinRole = NULL WHERE id = $idTemp");
-        
-        
+
+
         SQLUpdate("UPDATE Utilisateur SET role = 2 WHERE (id = 1 OR role = 1) AND dateFinRole IS NULL ORDER BY id ASC LIMIT 1");
 
         $msg = "Votre période de délégation est terminée.";
@@ -32,7 +32,8 @@ if (isset($_SESSION["idUser"])) {
 
 
 $view = valider("view");
-if (!$view) $view = "main";
+if (!$view)
+    $view = "main";
 
 include("./pages/header.php");
 
@@ -46,7 +47,7 @@ switch ($view) {
     //     break;
 
     default:
-        if (file_exists("pages/$view.php"))
-            include("pages/$view.php");
+        if (file_exists("./pages/$view.php"))
+            include("./pages/$view.php");
 }
 ?>
