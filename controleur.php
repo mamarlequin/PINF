@@ -109,7 +109,7 @@ if ($action = valider("action")) {
 			header("Location: index.php?view=compte&msg=" . urlencode($msg));
 			break;
 
-		case 'Enregistrer la disponibilité':
+		case 'Enregistrer':
 			$debut = valider("debut");
 			$fin = valider("fin");
 			if ($debut && $fin && isAdmin($_SESSION["idUser"])) {
