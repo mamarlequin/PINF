@@ -435,4 +435,39 @@ function nouvelle_reserv($idEquipement,$idUser,$dateDebut,$dateFin)
 
     return SQLInsert($SQL);
 }
+
+function lister_reserv_user($id){
+    $date = date("Y-m-d");
+
+    $SQL = "
+        SELECT 
+            Reservation.id AS idReserv, 
+            Reservation.dateDebut, 
+            Reservation.dateFin, 
+            Equipement.id AS idEquip, 
+            Equipement.nom 
+        FROM Reservation
+        JOIN Equipement ON Reservation.idEquipement = Equipement.id
+        WHERE Reservation.idUser = '$id'
+          AND Reservation.dateFin >= '$date'
+    ";
+
+    return SQLSelect($SQL);
+}
+
+function suppr_reserv($id){
+	$SQL = "DELETE FROM Reservation WHERE id = '$id'";
+	SQLDelete($SQL);
+}
+
+function ajouter_commentaire_eleve($idEquip, $idUser, $texte, $idReserv)
+{
+	$texte = addslashes($texte);
+
+	$SQL = "INSERT INTO Commentaire (idEquipement, idUser, contenu, resolu, idReservation) 
+            VALUES ('$idEquip', '$idUser', '$texte', 0, $idReserv)";
+
+	return SQLInsert($SQL);
+}
+
 ?>

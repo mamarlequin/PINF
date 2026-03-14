@@ -134,6 +134,30 @@ if ($action = valider("action")) {
 			}
 			break;
 
+		case 'supprimer' : 
+			$id = valider("id");
+			if($id){
+				suppr_reserv($id);
+				$qs = array("view" => "compte", "msg" => "Réservation supprimée !");
+			}
+
+			break;
+
+		case 'Ajouter Commentaire eleve' : 
+			$idReserv = valider("id_reserv");
+			$idequi = valider("id_equip");
+			$texte = valider("texte");
+			$idUser = $_SESSION["idUser"];
+			if($idReserv && $idequi && $texte && $idUser){
+				ajouter_commentaire_eleve($idequi, $idUser, $texte, $idReserv);
+				$qs = array("view" => "compte", "msg" => "Commentaire ajouté ! ");
+
+			}
+
+
+
+			break;
+
 		case 'Créer Utilisateur':
 			$nom = valider("nom");
 			$prenom = valider("prenom");
