@@ -263,21 +263,28 @@ if ($action = valider("action")) {
 				exit();
 			}
 			break;
-		case 'Modifier Dispo':
-			$idCreneau = valider("id_creneau");
-			$date = valider("date_jour");
-			$hD = valider("heure_debut");
-			$hF = valider("heure_fin");
+		case 'Enregistrer les modifications':
+			$idCreneau = valider("id");
+			$datef = valider("datefin");
+			$dated = valider("datedebut");
+			$hF = valider("heurefin");
+			$hD = valider("heuredebut");
 
-			if ($idCreneau && $date && $hD && $hF) {
-				$debut = $date . " " . $hD . ":00";
-				$fin = $date . " " . $hF . ":00";
+			if ($idCreneau && $dated && $hD && $hF && $datef) {
+				$debut = $dated . " " . $hD . ":00";
+				$fin = $datef . " " . $hF . ":00";
+				if($debut > $fin){
+				modifier_dispo($idCreneau, $fin, $debut);
+				}
+				else {
+				modifier_dispo($idCreneau, $debut, $fin);
+				}
 
 				include_once("libs/modele.php");
-				modifier_dispo($idCreneau, $debut, $fin);
 			}
 			header("Location: index.php?view=compte");
 			break;
+		
 		case 'reserver':
 			if (isset($_SESSION["idUser"]))
 			{
