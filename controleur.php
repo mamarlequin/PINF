@@ -323,6 +323,62 @@ if ($action = valider("action")) {
 				supp_equip($id);
 				$qs = array("view" => "machines", "msg" => "Suppression réussie");
 			} else $qs = array("view" => "machines", "msg" => "Suppression échouée");
+		case "modifier":
+			if(isset($_SESSION["idUser"]))
+			{
+				$idUser = $_SESSION["idUser"];
+				$idMachine = valider("id_machine");
+				$date = valider("date_res");
+				$deb = valider("debut");
+				$fin = valider("fin");
+				$idRes = valider("id_res");
+
+				$flag = 1;
+
+				if($deb > $fin)
+				{
+					$qs = array("view" => "reserver", "msg" => "L'heure de début est plus grande que l'heure de fin");
+					break;
+				}
+				
+				foreach(lister_machine() as $machine)
+				{
+					if($machine["id"] == $idMachine)
+						$flag = 0;
+				}
+			
+				if($flag)
+				{
+					$qs = array("view" => "reserver", "msg" => "La machine n'existe pas");
+					break;
+				}
+
+				$flag=1;
+
+				foreach(lister_res_tot($date, $date) as $res)
+				{
+					if($res["id"] == $idRes)
+						$flag = 0;
+				}
+
+
+				if($flag)
+				{
+					$qs = array("view" => "reserver", "msg" => "La reservation n'existe pas");
+					break;
+				}
+
+				$check = verif_reserv($idMachine, $date . " " . $deb . ":00", $date . " " . $fin . ":00",$idRes);
+
+				if (!empty($check)) {
+					suppr_reserv($idRes);
+					nouvelle_reserv($idMachine, $idUser, $date . " " . $deb . ":00", $date . " " . $fin . ":00");
+					$qs = array("view" => "reserver", "msg" => "Réservation réalisée avec succès");
+				} else {
+					$qs = array("view" => "reserver", "msg" => "Modification impossible");
+				}
+			}
+			break;
 	}
 }
 

@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 -- Structure de la table `Commentaire`
 --
 
-CREATE TABLE `Commentaire` (
+CREATE TABLE IF NOT EXISTS `Commentaire` (
   `id` int(10) UNSIGNED NOT NULL,
   `idEquipement` int(10) UNSIGNED NOT NULL,
   `idUser` int(10) UNSIGNED NOT NULL,
@@ -50,7 +50,7 @@ INSERT INTO `Commentaire` (`id`, `idEquipement`, `idUser`, `idReservation`, `con
 -- Structure de la table `Creneau`
 --
 
-CREATE TABLE `Creneau` (
+CREATE TABLE IF NOT EXISTS `Creneau` (
   `id` int(10) UNSIGNED NOT NULL,
   `idAdmin` int(10) UNSIGNED NOT NULL,
   `dateDebut` datetime NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `Creneau` (
 -- Structure de la table `Emprunt`
 --
 
-CREATE TABLE `Emprunt` (
+CREATE TABLE IF NOT EXISTS `Emprunt` (
   `id` int(10) UNSIGNED NOT NULL,
   `idUser` int(10) UNSIGNED NOT NULL,
   `idEquipement` int(10) UNSIGNED NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE `Emprunt` (
 -- Structure de la table `Equipement`
 --
 
-CREATE TABLE `Equipement` (
+CREATE TABLE IF NOT EXISTS `Equipement` (
   `id` int(10) UNSIGNED NOT NULL,
   `nom` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
@@ -100,7 +100,7 @@ INSERT INTO `Equipement` (`id`, `nom`, `type`, `enMaintenance`, `description`, `
 -- Structure de la table `Notification`
 --
 
-CREATE TABLE `Notification` (
+CREATE TABLE IF NOT EXISTS `Notification` (
   `id` int(10) UNSIGNED NOT NULL,
   `idUser` int(10) UNSIGNED NOT NULL,
   `contenu` varchar(255) NOT NULL
@@ -131,7 +131,7 @@ INSERT INTO `Notification` (`id`, `idUser`, `contenu`) VALUES
 -- Structure de la table `Reservation`
 --
 
-CREATE TABLE `Reservation` (
+CREATE TABLE IF NOT EXISTS `Reservation` (
   `id` int(10) UNSIGNED NOT NULL,
   `dateDebut` datetime NOT NULL,
   `dateFin` datetime NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE `Reservation` (
 -- Structure de la table `Utilisateur`
 --
 
-CREATE TABLE `Utilisateur` (
+CREATE TABLE IF NOT EXISTS `Utilisateur` (
   `id` int(10) UNSIGNED NOT NULL,
   `nom` varchar(255) NOT NULL,
   `prenom` varchar(255) NOT NULL,

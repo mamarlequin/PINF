@@ -18,6 +18,7 @@ var planningAdmin = {};
 var planningReservations = {};
 var machines = [];
 var $popup;
+var $modif;
 
 var offsetPage = 0;
 
@@ -30,7 +31,6 @@ function getLundiDeCetteSemaine() {
 }
 
 function estDansIntervalle(dateCaseCle, dateDebutFull, dateFinFull) {
-    // Sécurité : si les dates sont absentes, on retourne faux
     if (!dateDebutFull || !dateFinFull) return false;
 
     var dStart = dateDebutFull.split(' ')[0];
@@ -109,12 +109,11 @@ function afficherLigne(m, lundiRef) {
 
         
         var bgClass = m.enMaintenance ? "bg-stripes" : (!planningAdmin[cle]? "bg-slate-200/50" : "bg-white hover:bg-indigo-100/50 calendar-case cursor-pointer");
-        var clickAction = (planningAdmin[cle] && !m.enMaintenance) ? `onclick="reserverMachine(${m.id}, '${cle}',event)" ` : "";
+        var clickAction = (planningAdmin[cle] && !m.enMaintenance)? `onclick="reserverMachine(${m.id}, '${cle}',event)" ` : "";
 
         ligne += `
         <div data-nom="${m.nom}" class="flex-1 p-2 border-r border-slate-100 last:border-r-0 flex flex-col gap-1.5 min-h-[85px] ${bgClass}" ${clickAction}>
             ${afficherRes(m.id, cle)}
-            ${afficherEmprunts(m.id, cle)}
         </div>`;
         jour.setDate(jour.getDate() + 1);
     }
@@ -139,9 +138,12 @@ function afficherRes(mId, dateCle) {
     var rep = "";
     for (var r of planningReservations[mId]) {
         if (estDansIntervalle(dateCle, r.dateDebut, r.dateFin)) {
+            console.log(r);
             var hover = "cursor-default";
+            var onclick = "";
             if (r.idUser == <?php echo valider("idUser", "SESSION") ?>) {
-                hover = "hover:bg-indigo-700 cursor-pointer";
+                hover = "hover:bg-indigo-800 cursor-pointer";
+                onclick = 'onclick="modifierRes(' + mId + ', \'' + dateCle + '\', event)"';
             }
 
             var texte = "";
@@ -159,41 +161,8 @@ function afficherRes(mId, dateCle) {
             }
 
             rep += `
-            <div class="bg-indigo-600 text-white text-[9px] font-bold py-1.5 px-2 rounded-lg shadow-sm ${hover} flex items-center justify-center">
+            <div ${onclick} id="${r.id}"  class="bg-indigo-600 text-white text-[9px] font-bold py-1.5 px-2 rounded-lg shadow-sm ${hover} flex items-center justify-center">
                 <span>${texte}</span>
-            </div>`;
-        }
-    }
-    return rep;
-}
-
-function afficherEmprunts(mId, dateCle) {
-    if (!planningEmprunts[mId]) return "";
-    var rep = "";
-
-    for (var e of planningEmprunts[mId]) {
-        if (estDansIntervalle(dateCle, e.dateDebut, e.dateFin)) {
-            
-            var hover = "cursor-default";
-            if (e.idUser == <?php echo valider("idUser", "SESSION") ?>) {
-                hover = "hover:bg-green-600 cursor-pointer";
-            } 
-
-            var texte = "Emprunt";
-            var dStart = e.dateDebut.split(' ')[0];
-            var dEnd = e.dateFin.split(' ')[0];
-            
-            if (dStart === dEnd) {
-                texte = e.heureDebut + " - " + e.heureFin;
-            } else if (dateCle === dStart) {
-                texte = "Début : " + e.heureDebut;
-            } else if (dateCle === dEnd) {
-                texte = "Fin : " + e.heureFin;
-            }
-
-            rep += `
-            <div class="bg-green-500  text-white text-[9px] font-bold py-1.5 px-2 rounded-lg shadow-sm ${hover} flex items-center justify-center">
-                ${texte}
             </div>`;
         }
     }
@@ -213,6 +182,7 @@ function reserverMachine(id, date, e) {
     var nom = $(e.currentTarget).attr("data-nom");
     $("#info-res").text((nom ? nom : "Machine " + id) + " le " + date);
 
+    $modif.addClass("hidden");
     $popup.removeClass("hidden"); 
 
     var popupHeight = $popup.outerHeight();
@@ -234,6 +204,83 @@ function reserverMachine(id, date, e) {
     });
 }
 
+function modifierRes(id, date, e) {
+    e.stopPropagation();
+
+    $("#debut-modif").val("");
+    $("#fin-modif").val("");
+    $("#form-machine-modif").val(id);
+    $("#form-date-modif").val(date);
+    $("#form-id-modif").val($(e.currentTarget).attr("id"));
+
+    var nom = $(e.currentTarget).parent().attr("data-nom");
+    $("#info-modif").text((nom ? nom : "Machine " + id) + " le " + date);
+
+    $popup.addClass("hidden");
+    $modif.removeClass("hidden"); 
+
+    var popupHeight = $modif.outerHeight();
+    var popupWidth = $modif.outerWidth();
+
+    var left = e.pageX + 20;
+
+    var top = e.pageY + 10;
+
+    if ((top + popupHeight) - ($(window).scrollTop() + $(window).height()) > 0) {
+        top = top - ((top + popupHeight) - ($(window).scrollTop() + $(window).height())) - 10;
+    }
+
+    if (left < 10) left = 10;
+
+    $modif.css({ 
+        top: top + "px", 
+        left: left + "px" 
+    });
+}
+
+function verif_horaires(deb,fin,form)
+{
+    var t1 = $(deb).val();
+    var t2 = $(fin).val();
+    var tmin = "25:00";
+    var tmax = "00:00";
+
+    date = $(form).val();
+
+    if (!date || !planningAdmin[date]) return;
+
+    if(t2 != "" && t1 != "" && t2 < t1)
+    {
+        $(fin).val(t1);
+        t2 = t1;
+    }
+
+    for (var dates of planningAdmin[date]) {
+        if(dates["debut"] < tmin)
+        {
+            tmin = dates["debut"];
+        }
+        if(dates["fin"] > tmax)
+        {
+            tmax = dates["fin"];
+        }
+    }
+
+
+    if(t1 != "" && t1 < tmin)
+    {
+        $(deb).val(tmin);
+    }
+    
+    if(t2 > tmax)
+        $(fin).val(tmax);
+    if(t2 != "" && t2 < tmin)
+        $(fin).val(tmin);
+    
+    if(t1 > tmax)
+        $(deb).val(tmax);
+}
+
 $(document).ready(function() {
 
 
@@ -241,55 +288,25 @@ $(document).ready(function() {
     $(document).on("keydown", function(e) {
         if (e.key === "Escape") {
             $popup.addClass("hidden");
+            $modif.addClass("hidden");
             caseCliquee = null;
         }
     });
 
     
 
-    $("#debut, #fin").on("change",function(e) {
-        var t1 = $("#debut").val();
-        var t2 = $("#fin").val();
-        var tmin = "25:00";
-        var tmax = "00:00";
-        
-
-        if(t2 != "" && t1 != "" && t2 < t1)
-        {
-            $("#fin").val(t1);
-            t2 = t1;
-        }
-
-        date = $("#form-date").val();
-        
-        for (var dates of planningAdmin[date]) {
-            if(dates["debut"] < tmin)
-            {
-                tmin = dates["debut"];
-            }
-            if(dates["fin"] > tmax)
-            {
-                tmax = dates["fin"];
-            }
-        }
-
-        if(t1 != "" && t1 < tmin)
-            $("#debut").val(tmin);
-        
-        if(t2 > tmax)
-            $("#fin").val(tmax);
-        if(t2 != "" && t2 < tmin)
-            $("#fin").val(tmin);
-        
-        if(t1 > tmax)
-            $("#debut").val(tmax);
-
+    $("#debut, #fin").on("change", function() {
+        verif_horaires("#debut", "#fin", "#form-date");
     });
 
-
+    $("#debut-modif, #fin-modif").on("change", function() {
+        verif_horaires("#debut-modif", "#fin-modif", "#form-date-modif");
+    });
    
 
     $popup = $("#pop-reservation");
+
+    $modif = $("#pop-modif");
 
     chargerSemaine(0);
 
@@ -299,8 +316,13 @@ $(document).ready(function() {
         e.stopPropagation();
     });
 
+    $modif.on("click", function(e) {
+        e.stopPropagation();
+    });
+
     $(document).on("click", function() {
         $popup.addClass("hidden");
+        $modif.addClass("hidden");
         caseCliquee = null;
     });
 });
@@ -310,7 +332,7 @@ $(document).ready(function() {
 
 
 <div id="calendrier-container" class="max-w-full bg-whiterounded-lg shadow-sm overflow-hidden font-sans select-none my-18">
-    <!-- Le calendrier sera chargé ici -->
+
 </div>
 
 
@@ -332,6 +354,30 @@ $(document).ready(function() {
         </div>
 
         <button type="submit" name="action" value="reserver" class="w-full bg-indigo-600 text-white py-2 rounded text-sm hover:bg-indigo-700">
+            Valider
+        </button>
+    </form>
+</div>
+
+<div id="pop-modif" class="hidden absolute z-[100] bg-white border border-gray-300 shadow-xl rounded-lg p-4 w-64 border-t-4 border-t-indigo-600">
+    <h3 class="font-bold text-indigo-600 mb-2">Modifier</h3>
+    <p id="info-modif" class="text-xs text-gray-500 mb-4"></p>
+    
+    <form action="controleur.php" method="POST" class="space-y-3">
+        <input type="hidden" name="id_machine" id="form-machine-modif">
+        <input type="hidden" name="id_res" id="form-id-modif">
+        <input type="hidden" name="date_res" id="form-date-modif">
+        
+        <div>
+            <label class="block text-[10px] uppercase font-bold text-gray-400">Heure début</label>
+            <input type="time" id="debut-modif" name="debut" class="w-full border rounded px-2 py-1 text-sm" required>
+        </div>
+        <div>
+            <label class="block text-[10px] uppercase font-bold text-gray-400">Heure fin</label>
+            <input type="time" id="fin-modif" name="fin" class="w-full border rounded px-2 py-1 text-sm" required>
+        </div>
+
+        <button type="submit" name="action" value="modifier" class="w-full bg-indigo-600 text-white py-2 rounded text-sm hover:bg-indigo-700">
             Valider
         </button>
     </form>

@@ -184,7 +184,14 @@ function lister_res($debut, $fin)
 	return $planning;
 }
 
-
+function lister_res_tot($debut, $fin)
+{
+	$SQL = "SELECT id
+	FROM Reservation 
+	WHERE (dateDebut <= '$fin' OR dateFin >= '$debut')
+	ORDER BY dateDebut ASC;";
+	return parcoursRs(SQLSelect($SQL));
+}
 
 function lister_emprunts($debut, $fin)
 {
@@ -405,17 +412,22 @@ function lister_user($id){
 	return parcoursRs(SQLSelect($SQL));
 }
 
-function verif_reserv($mId,$deb,$fin){
+function verif_reserv($mId,$deb,$fin,$idRes=-1){
 	$SQL = "SELECT e.id
 			FROM Equipement e
 			WHERE e.id = '$mId'
 			AND e.enMaintenance = 0
 
+
 			AND NOT EXISTS (
 				SELECT 1 FROM Reservation r 
 				WHERE r.idEquipement = e.id 
 				AND (
-					(r.dateDebut < '$fin' AND r.dateFin > '$deb')
+					(r.dateDebut < '$fin' AND r.dateFin > '$deb')" . 
+					
+					($idRes != -1 ? "AND r.id != '$idRes'" : "")
+					
+					."
 				)
 			)
 
