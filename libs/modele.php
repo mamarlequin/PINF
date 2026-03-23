@@ -380,55 +380,7 @@ function disparait_user($mot)
     return parcoursRs(SQLSelect($SQL));
 }
 
-function recherche_machine_filtre($idUser, $date, $machines){
 
-    $machines = array_map('intval', $machines);
-$machinesSQL = implode(",", $machines);
-$idUser = intval($idUser);
-
-$SQL = "
-SELECT 
-    Reservation.id AS idReserv,
-    Reservation.dateDebut,
-    Reservation.dateFin,
-    Equipement.id AS idEquip,
-    Equipement.nom
-FROM Reservation
-JOIN Equipement ON Reservation.idEquipement = Equipement.id
-WHERE Reservation.idUser = $idUser
-AND Reservation.idEquipement IN ($machinesSQL)
-";
-
-if ($date) {
-    $SQL .= " AND '$date' BETWEEN DATE(Reservation.dateDebut) AND DATE(Reservation.dateFin)";
-}
-
-$SQL .= " ORDER BY Reservation.dateDebut";
-
-return parcoursRs(SQLSelect($SQL));
-
-}
-
-function dispa_filtre($idUser, $date, $machines){
-$SQL = "
-SELECT 
-    Reservation.id AS idReserv,
-    Reservation.dateDebut,
-    Reservation.dateFin,
-    Equipement.id AS idEquip,
-    Equipement.nom
-FROM Reservation
-JOIN Equipement ON Reservation.idEquipement = Equipement.id
-WHERE Reservation.idUser = $idUser
-AND Reservation.idEquipement NOT IN ($machines)
-";
-
-if ($date) {
-    $SQL .= " AND '$date' NOT BETWEEN DATE(Reservation.dateDebut) AND DATE(Reservation.dateFin)";
-}
-
-$SQL .= " ORDER BY Reservation.dateDebut";
-}
 
 function recherche_user($mot)
 {
@@ -563,7 +515,7 @@ function recherche_dispo_filtre($id, $date){
 	$SQL = "SELECT * 
         FROM Creneau 
         WHERE idAdmin = $id 
-          AND (DATE(dateDebut) = '$date' OR DATE(dateFin) = '$date')";
+        AND (DATE(dateDebut) = '$date' OR DATE(dateFin) = '$date')";
 return parcoursRs(SQLSelect($SQL));
 }
 
@@ -575,4 +527,71 @@ function recherche_dispo_filtre_dispa($id, $date){
 return parcoursRs(SQLSelect($SQL));
 }
 
+
+function recherche_machine_filtre($idUser, $date, $machines){
+
+    if (empty($machines)) {
+        return [];
+    }
+
+    $idUser = intval($idUser);
+    $machines = array_map('intval', $machines);
+    $machinesSQL = implode(",", $machines);
+
+    $SQL = "
+    SELECT 
+        Reservation.id AS idReserv,
+        Reservation.dateDebut,
+        Reservation.dateFin,
+        Equipement.id AS idEquip,
+        Equipement.nom
+    FROM Reservation
+    JOIN Equipement ON Reservation.idEquipement = Equipement.id
+    WHERE Reservation.idUser = $idUser
+    AND Reservation.idEquipement IN ($machinesSQL)
+    ";
+
+    if ($date) {
+        $date = addslashes($date);
+        $SQL .= " AND Reservation.dateDebut <= '$date' AND Reservation.dateFin >= '$date'";
+    }
+
+    $SQL .= " ORDER BY Reservation.dateDebut";
+
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function dispa_filtre($idUser, $date, $machines){
+
+    $idUser = intval($idUser);
+    $machines = array_map('intval', $machines);
+
+    if (empty($machines)) {
+        $machinesSQL = "0";
+    } else {
+        $machinesSQL = implode(",", $machines);
+    }
+
+    $SQL = "
+    SELECT 
+        Reservation.id AS idReserv,
+        Reservation.dateDebut,
+        Reservation.dateFin,
+        Equipement.id AS idEquip,
+        Equipement.nom
+    FROM Reservation
+    JOIN Equipement ON Reservation.idEquipement = Equipement.id
+    WHERE Reservation.idUser = $idUser
+    OR Reservation.idEquipement NOT IN ($machinesSQL)
+    ";
+
+    if ($date) {
+        $date = addslashes($date);
+        $SQL .= " AND (Reservation.dateFin > '$date' OR Reservation.dateDebut < '$date')";
+    }
+
+    $SQL .= " ORDER BY Reservation.dateDebut";
+
+    return parcoursRs(SQLSelect($SQL));
+}
 ?>

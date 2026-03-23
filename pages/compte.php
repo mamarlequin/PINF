@@ -352,7 +352,7 @@ function formatDate(dateStr){
     
     <?php foreach ($reserv_ancien_user as $res) { ?>
 
-<div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="<?= $res["idReserv"] ?>">
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
 
     <div class="flex justify-between items-start mb-4" >
 
@@ -427,7 +427,7 @@ function formatDate(dateStr){
 
 <?php foreach ($reserv_user as $res) { ?>
 
-<div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="<?= $res["idReserv"] ?>">
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
 
         <div class="flex justify-between items-start mb-4" >
 
@@ -543,28 +543,59 @@ $(document).ready(function() {
     $("input[name='machines[]']:checked").each(function(){
         machines.push($(this).val());
     });
+    console.log(date);
+    //if (!date) {
+      //  $(".reservationMac").show();
+        //return;
+    //}
+     $.ajax({
+    url: "ajax.php",
+    type: "GET",
+    data: {
+        action: "filtre_mac_invers",
+        date: date,
+        machines:machines,
+    },
+    dataType: "json",
 
+    success: function(res){
+        console.log("SUCCESS :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idReserv).hide();
+            })
+    },
+
+    error: function(xhr, status, error){
+        console.log("ERREUR AJAX");
+        console.log("Response :", xhr.responseText); // ✅ ici ça marche
+        console.log("Status :", status);
+        console.log("Error :", error);
+    }
+
+   })
     $.ajax({
-        url: "ajax.php",
-        type: "GET",
+        url :"ajax.php",
+        type : "GET",
         data: {
-            action: "filtre_mac",
+            action:"filtre_mac",
             date: date,
             machines: machines
         },
         dataType: "json",
-        success: function(reservs){
-
-            $(".reservation").hide();
-
-            reservs.forEach(res => {
-                $("#" + res.idReserv).show();
-            });
-
-        }
-    });
-
-}
+        success: function(res){
+            console.log("S :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idReserv).show();
+            })
+        }, 
+        error: function() {
+                    console.log("Erreur lors de la récupération des machines");
+                    console.log("Response :", xhr.responseText); // ✅ ici ça marche
+        console.log("Status :", status);
+        console.log("Error :", error);
+                }
+    })
+   }
 
 function filtrerDispo(){
     let date = $("#rechercheDispo").val();
