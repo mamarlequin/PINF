@@ -24,6 +24,8 @@ $user = lister_user($idUser);
 $reserv_user = lister_reserv_user($idUser) ?: [];
 $dispo = dispo($idUser) ?: [];
 $reserv_ancien_user = lister_reserv_user_ancienne($idUser) ?: [];
+$emprunts = lister_emprunt($idUser) ?: [];
+//$outils = lister_outil($idUser) ?: [];
 
 ?>
 
@@ -83,6 +85,12 @@ function formatDate(dateStr){
         $("#dashboard").on("click", function () {
             //$("#tabbord").toggleClass("hidden");
             showSection("tabbord");
+            updateTime();
+        });
+
+        $("#emprunts").on("click", function () {
+            //$("#tabbord").toggleClass("hidden");
+            showSection("MesEmprunts");
             updateTime();
         });
 
@@ -186,13 +194,16 @@ function formatDate(dateStr){
 
 <!-- Bannière -->
 <div class="container mx-auto p-6 max-w-4xl">
-    <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
+    <div class="bg-white shadow-lg rounded-3xl p-8 mb-15 flex justify-between items-center border border-gray-100">
         <div id="dashboard">
             <button class="transition-colors hover:text-indigo-600"> Tableau de Bord </button>
         </div>
         <?php if(isAdmin($idUser)){ ?>
         <div id="admin">
             <button class="transition-colors hover:text-indigo-600"> Mes disponibilités </button>
+        </div>
+         <div id="emprunts">
+            <button class="transition-colors hover:text-indigo-600"> Mes emprunts </button>
         </div>
         <?php } ?>
         <div id="calendar">
@@ -510,6 +521,215 @@ function formatDate(dateStr){
 <?php } ?>
 
 </div>
+
+
+
+<!-------------------- EMPRUNTS --->
+
+  <div class="section hidden container mx-auto p-6 max-w-4xl" id="MesEmprunts">
+<!-- Barre de recherche date -->
+<div class="flex items-center mb-2">
+    <input
+        id="rechercheMachine"
+        type="date"
+        name="recherche"
+        placeholder="Entrez votre recherche..."
+        class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+
+    <button
+        class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
+        <svg
+            class="w-4 h-4 text-gray-600"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+            <line x1="16.65" y1="16.65" x2="22" y2="22"
+                stroke="currentColor" stroke-width="2" />
+        </svg>
+    </button>
+</div>
+<!-- filtre des machines -->
+<div class="flex flex-wrap gap-2 mb-6">
+<?php foreach ($machine as $mac): 
+    $id = "machine_" . $mac["id"];
+?>
+    <div class="relative">
+
+        <input type="checkbox" id="<?= $id ?>" name="machines[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
+
+        <label for="<?= $id ?>"
+               class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
+            <?= htmlspecialchars($mac["nom"]) ?>
+        </label>
+    </div>
+<?php endforeach; ?>
+</div>
+<!-- bouton pour voir les anciennes reservations -->
+<button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_reserv()">
+    Voir d'anciennes réservations
+</button>
+<!-- Affichage de ces anciennes réservations  -->
+<div id=ancien_reser class='hidden'>
+    
+    <?php foreach ($reserv_ancien_user as $res) { ?>
+
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+
+    <div class="flex justify-between items-start mb-4" >
+
+        <div>
+            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                <?= $res["nom"] ?>
+            </h3>
+
+            <div class="flex flex-wrap gap-3 mb-2">
+
+                
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                </div>
+
+               
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                   
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
+                </div>
+
+            </div>
+        </div>
+<!-- petite bannière réserver -->
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+            Réservé
+        </span>
+
+    </div>
+
+    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
+<!-- bouton signaler un pb -->
+            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
+            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
+                + Signaler un problème
+            </button>
+        </form>
+
+    </div>
+    <!-- Ajouter un commentaire, la partie qui s'affiche après appui sur le bouton -->
+    <div id='add-com-<?= $res["idReserv"] ?>_' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
+                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
+                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
+                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
+                <div class="flex justify-end">
+                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                        Envoyer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+</div>
+
+<?php } ?>
+
+    
+</div>
+<!-- si aucune reservations -->
+<?php if (empty($reserv_user)) { ?>
+    <p class="text-slate-500 italic">Aucune réservation en cours.</p>
+<?php } ?>
+<!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
+<?php foreach ($reserv_user as $res) { ?>
+
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+
+        <div class="flex justify-between items-start mb-4" >
+
+        <div>
+            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                <?= $res["nom"] ?>
+            </h3>
+
+            <div class="flex flex-wrap gap-3 mb-2">
+
+                
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                </div>
+
+                
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                   
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
+                </div>
+
+            </div>
+        </div>
+
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+            Réservé
+        </span>
+
+    </div>
+<!-- Bouton signaler un pb -->
+    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
+
+            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
+            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
+                + Signaler un problème
+            </button>
+        </form>
+
+        <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+            <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
+<!-- Bouton supprimer la résevations -->
+            <button type="submit" name="action" value="supprimer"
+            class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition-all font-medium">
+                Supprimer la réservation
+            </button>
+        </form>
+
+    </div>
+    <!-- formulaire du commenaitre -->
+    <div id='add-com-<?= $res["idReserv"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
+                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
+                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
+                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
+                <div class="flex justify-end">
+                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                        Envoyer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+</div>
+
+<?php } ?>
+
+</div>
+
+
+
 
 
 <!-- Statistiques -->
