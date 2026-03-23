@@ -55,6 +55,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
             <div class="hidden md:flex items-center gap-14 text-sm-bold font-medium ">
                 <a href="./pages/reserver.php" class="lien-protege transition-colors hover:text-indigo-600">Réserver</a>
                 <a href="./pages/machines.php" class="lien-protege transition-colors hover:text-indigo-600">Machines</a>
+                <a href="./pages/emprunts.php" class="lien-protege transition-colors hover:text-indigo-600">Emprunter</a>
                 <?php
                 if (valider("connecte", "SESSION")) {
                 ?>
@@ -91,6 +92,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\" ?>";
         <div id="mobileMenu" class="hidden md:hidden mt-4 bg-slate-300 rounded-2xl shadow-md px-6 py-4 flex flex-col gap-4">
             <a href="./pages/reserver.php" class="lien-protege transition-colors hover:text-indigo-600">Réserver</a>
             <a href="./pages/machines.php" class="lien-protege transition-colors hover:text-indigo-600">Machines</a>
+            <a href="./pages/emprunts.php" class="lien-protege transition-colors hover:text-indigo-600">Emprunter</a>
             <?php if (valider("connecte", "SESSION")) { ?>
                 <?php if (isAdmin($_SESSION["idUser"])) { ?>
                     <a href="index.php?view=admin" class="transition-colors hover:text-indigo-600">Administration</a>
