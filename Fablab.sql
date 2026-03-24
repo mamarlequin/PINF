@@ -146,7 +146,7 @@ ALTER TABLE `Emprunt`
 ADD CONSTRAINT `fk_emprunt_user`
 FOREIGN KEY (`idUser`) REFERENCES `Utilisateur`(`id`) ON DELETE CASCADE,
 ADD CONSTRAINT `fk_emprunt_equipement`
-FOREIGN KEY (`idEquipement`) REFERENCES `Equipement`(`id`) ON DELETE CASCADE;
+FOREIGN KEY (`idEquipement`) REFERENCES `Outil`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `Commentaire`
 ADD CONSTRAINT `fk_commentaire_equipement`

@@ -596,12 +596,25 @@ function dispa_filtre($idUser, $date, $machines){
 }
 
 function lister_emprunt($id){
-	$SQL = "SELECT * FROM Emprunt JOIN Outil ON Outil.id = Emprunt.idEquipement WHERE $id = Emprunt.idUser";
+	$SQL = "SELECT * 
+	        FROM Emprunt 
+	        JOIN Outil ON Outil.id = Emprunt.idEquipement 
+	        WHERE Emprunt.idUser = $id 
+	        AND Emprunt.dateRenduTheorique IS NULL";
 	return parcoursRs(SQLSelect($SQL));
 }
 
 function lister_outil(){
 	$SQL ="SELECT * FROM Outil";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+function lister_emprunt_user_ancienne($id){
+	$SQL = "SELECT * 
+	        FROM Emprunt 
+	        JOIN Outil ON Outil.id = Emprunt.idEquipement 
+	        WHERE Emprunt.idUser = $id 
+	        AND Emprunt.dateRenduTheorique IS NOT NULL";
 	return parcoursRs(SQLSelect($SQL));
 }
 ?>

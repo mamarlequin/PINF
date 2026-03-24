@@ -24,6 +24,7 @@ $user = lister_user($idUser);
 $reserv_user = lister_reserv_user($idUser) ?: [];
 $dispo = dispo($idUser) ?: [];
 $reserv_ancien_user = lister_reserv_user_ancienne($idUser) ?: [];
+$emprunt_ancien_user = lister_emprunt_user_ancienne($idUser) ?: [];
 $emprunts = lister_emprunt($idUser) ?: [];
 $outils = lister_outil($idUser) ?: [];
 
@@ -530,9 +531,9 @@ function formatDate(dateStr){
 <!-- Barre de recherche date -->
 <div class="flex items-center mb-2">
     <input
-        id="rechercheMachine"
+        id="rechercheEmprunt"
         type="date"
-        name="recherche"
+        name="rechercheEmprunt"
         placeholder="Entrez votre recherche..."
         class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
 
@@ -549,14 +550,14 @@ function formatDate(dateStr){
         </svg>
     </button>
 </div>
-<!-- filtre des machines -->
+<!-- filtre des outils -->
 <div class="flex flex-wrap gap-2 mb-6">
-<?php foreach ($machine as $mac): 
-    $id = "machine_" . $mac["id"];
+<?php foreach ($outils as $mac): 
+    $id = "outil_" . $mac["id"];
 ?>
     <div class="relative">
 
-        <input type="checkbox" id="<?= $id ?>" name="machines[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
+        <input type="checkbox" id="<?= $id ?>" name="outil[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
 
         <label for="<?= $id ?>"
                class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
@@ -565,16 +566,16 @@ function formatDate(dateStr){
     </div>
 <?php endforeach; ?>
 </div>
-<!-- bouton pour voir les anciennes reservations -->
-<button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_reserv()">
-    Voir d'anciennes réservations
+<!-- bouton pour voir les ancien emprunts -->
+<button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_emrpunt()">
+    Voir d'anciens emprunts
 </button>
-<!-- Affichage de ces anciennes réservations  -->
-<div id=ancien_reser class='hidden'>
+<!-- Affichage de ces anciens emprunts  -->
+<div id=ancien_empr class='hidden'>
     
-    <?php foreach ($reserv_ancien_user as $res) { ?>
+    <?php foreach ($emprunt_ancien_user as $res) { ?>
 
-<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $res["idOutil"] ?>">
 
     <div class="flex justify-between items-start mb-4" >
 
@@ -602,14 +603,14 @@ function formatDate(dateStr){
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
+                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduReel"])) ?>
                 </div>
 
             </div>
         </div>
 <!-- petite bannière réserver -->
         <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
-            Réservé
+            Rendu
         </span>
 
     </div>
@@ -644,11 +645,11 @@ function formatDate(dateStr){
     
 </div>
 <!-- si aucune reservations -->
-<?php if (empty($reserv_user)) { ?>
+<?php if (empty($emprunts)) { ?>
     <p class="text-slate-500 italic">Aucune réservation en cours.</p>
 <?php } ?>
 <!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
-<?php foreach ($reserv_user as $res) { ?>
+<?php foreach ($emprunts as $res) { ?>
 
 <div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
 
@@ -678,14 +679,14 @@ function formatDate(dateStr){
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
-                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
+                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduTheorique"])) ?>
                 </div>
 
             </div>
         </div>
 
         <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
-            Réservé
+            Emprunté
         </span>
 
     </div>
@@ -701,17 +702,13 @@ function formatDate(dateStr){
         <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
             <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
 <!-- Bouton supprimer la résevations -->
-            <button type="submit" name="action" value="supprimer"
-            class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition-all font-medium">
-                Supprimer la réservation
-            </button>
         </form>
 
     </div>
     <!-- formulaire du commenaitre -->
-    <div id='add-com-<?= $res["idReserv"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+    <div id='add-com-<?= $res["idOutil"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
             <form action="controleur.php" method="POST" class="flex flex-col gap-3">
-                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
+                <input type="hidden" name="id_reserv" value="<?= $res["idOutil"] ?>">
                 <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
                 <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
                 <div class="flex justify-end">
@@ -825,6 +822,69 @@ $(document).ready(function() {
                 }
     })
    }
+
+function filtrerEmprunts() {///filtre avec machine et date
+
+    let date = $("#rechercheEmprunt").val();
+    let machines = [];
+
+    $("input[name='outil[]']:checked").each(function(){
+        machines.push($(this).val());
+    });
+    console.log(date);
+    //if (!date) {
+      //  $(".reservationMac").show();
+        //return;
+    //}
+     $.ajax({
+    url: "ajax.php",
+    type: "GET",
+    data: {
+        action: "filtre_emp_invers",
+        date: date,
+        emprunts:machines,
+    },
+    dataType: "json",
+
+    success: function(res){
+        console.log("SUCCESS :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idOutil).hide();
+            })
+    },
+
+    error: function(xhr, status, error){
+        console.log("ERREUR AJAX");
+        console.log("Response :", xhr.responseText); 
+        console.log("Status :", status);
+        console.log("Error :", error);
+    }
+
+   })
+    $.ajax({
+        url :"ajax.php",
+        type : "GET",
+        data: {
+            action:"filtre_emp",
+            date: date,
+            emprunts: machines
+        },
+        dataType: "json",
+        success: function(res){
+            console.log("S :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idOutil).show();
+            })
+        }, 
+        error: function() {
+                    console.log("Erreur lors de la récupération des machines");
+                    console.log("Response :", xhr.responseText); 
+        console.log("Status :", status);
+        console.log("Error :", error);
+                }
+    })
+   }
+
 
 function filtrerDispo(){
     let date = $("#rechercheDispo").val();
