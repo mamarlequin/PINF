@@ -596,12 +596,12 @@ function dispa_filtre($idUser, $date, $machines){
 }
 
 function lister_emprunt($id){
-	$SQL = "SELECT * FROM Emprunt JOIN Outils ON Outils.id = Emprunt.idEquipement WHERE $id = Emprunt.idUser";
+	$SQL = "SELECT * FROM Emprunt JOIN Outil ON Outil.id = Emprunt.idEquipement WHERE $id = Emprunt.idUser";
 	return parcoursRs(SQLSelect($SQL));
 }
 
 function lister_outil(){
-	$SQL ="SELECT * FROM Outils";
+	$SQL ="SELECT * FROM Outil";
 	return parcoursRs(SQLSelect($SQL));
 }
 ?>

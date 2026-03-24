@@ -25,7 +25,7 @@ $reserv_user = lister_reserv_user($idUser) ?: [];
 $dispo = dispo($idUser) ?: [];
 $reserv_ancien_user = lister_reserv_user_ancienne($idUser) ?: [];
 $emprunts = lister_emprunt($idUser) ?: [];
-//$outils = lister_outil($idUser) ?: [];
+$outils = lister_outil($idUser) ?: [];
 
 ?>
 
