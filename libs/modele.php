@@ -596,11 +596,11 @@ function dispa_filtre($idUser, $date, $machines){
 }
 
 function lister_emprunt($id){
-	$SQL = "SELECT * 
+	$SQL = "SELECT Emprunt.id as idOutil, Outil.nom, Emprunt.dateRenduTheorique, Emprunt.dateDebut
 	        FROM Emprunt 
 	        JOIN Outil ON Outil.id = Emprunt.idEquipement 
 	        WHERE Emprunt.idUser = $id 
-	        AND Emprunt.dateRenduTheorique IS NULL";
+	        AND Emprunt.dateRenduReel IS  NULL";
 	return parcoursRs(SQLSelect($SQL));
 }
 
@@ -610,11 +610,83 @@ function lister_outil(){
 }
 
 function lister_emprunt_user_ancienne($id){
-	$SQL = "SELECT * 
+	$SQL = "SELECT Outil.id as idOutil, Outil.nom, Emprunt.dateRenduReel, Emprunt.dateDebut
 	        FROM Emprunt 
 	        JOIN Outil ON Outil.id = Emprunt.idEquipement 
 	        WHERE Emprunt.idUser = $id 
-	        AND Emprunt.dateRenduTheorique IS NOT NULL";
+	        AND Emprunt.dateRenduReel IS NOT NULL";
 	return parcoursRs(SQLSelect($SQL));
 }
+
+function recherche_emp_filtre($idUser, $date = null, $machines = []) {
+    $idUser = intval($idUser);
+
+    $conditions = ["Emprunt.idUser = $idUser"];
+
+  if (!empty($machines)) {
+    $machines = array_map('intval', $machines);
+    $machinesSQL = implode(",", $machines);
+    $conditions[] = "Emprunt.idEquipement IN ($machinesSQL)";
+} else {
+    // Aucun outil sélectionné → condition impossible
+    $conditions[] = "1=0";
+}
+
+    if (!empty($date)) {
+        $date = addslashes($date);
+        $conditions[] = "Emprunt.dateDebut <= '$date 23:59:59' AND Emprunt.dateRenduTheorique >= '$date 00:00:00'";
+    }
+
+    $whereSQL = implode(" AND ", $conditions);
+
+    $SQL = "
+        SELECT 
+            Emprunt.id AS idOutil,
+            Emprunt.dateDebut,
+            Emprunt.dateRenduTheorique,
+            Outil.id AS idEquip,
+            Outil.nom
+        FROM Emprunt
+        JOIN Outil ON Emprunt.idEquipement = Outil.id
+        WHERE $whereSQL
+        ORDER BY Emprunt.dateDebut
+    ";
+
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function recherche_emp_filtre_dispa($idUser, $date = null, $machines = []) {
+    $idUser = intval($idUser);
+
+    if (!empty($machines)) {
+        $machines = array_map('intval', $machines);
+        $machinesSQL = implode(",", $machines);
+    } else {
+        $machinesSQL = "0";
+    }
+
+    $SQL = "
+        SELECT 
+            Emprunt.id AS idReserv,
+            Emprunt.dateDebut,
+            Emprunt.dateRenduTheorique,
+            Outil.id AS idEquip,
+            Outil.nom
+        FROM Emprunt
+        JOIN Outil ON Emprunt.idEquipement = Outil.id
+        WHERE Emprunt.idUser = $idUser
+        OR Emprunt.idEquipement NOT IN ($machinesSQL)
+    ";
+
+    if (!empty($date)) {
+        $date = addslashes($date);
+        $SQL .= " AND (Emprunt.dateRenduTheorique > '$date 00:00:00' OR Emprunt.dateDebut < '$date 23:59:59')";
+    }
+
+    $SQL .= " ORDER BY Emprunt.dateDebut";
+
+    return parcoursRs(SQLSelect($SQL));
+}
+
+
 ?>
