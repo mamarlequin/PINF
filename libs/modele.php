@@ -262,6 +262,12 @@ function modifier_dispo($idCreneau, $dateDebut, $dateFin)
 	return SQLUpdate($SQL);
 }
 
+function get_user_reserv($idRes)
+{
+	$SQL = "SELECT idUser FROM Reservation WHERE id = '$idRes'";
+	return SQLGetChamp($SQL);
+}
+
 function creer_utilisateur($nom, $prenom, $email, $role)
 {
 
