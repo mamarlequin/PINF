@@ -32,20 +32,28 @@ $reserv_nb = lister_reserv();
 ?>
 
 <div class="container mx-auto p-6 max-w-4xl">
-    <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
-        <div id="dashboard">
-            <button class="transition-colors hover:text-indigo-600"> Disponibilitées </button>
-        </div>
-        <div id="calendar">
-            <button class="transition-colors hover:text-indigo-600"> Ajouter un membre </button>
-        </div>
-        <div id="stat">
-            <button class="transition-colors hover:text-indigo-600"> Statistiques </button>
-        </div>
+  <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 border border-gray-100 flex flex-wrap justify-center gap-6 items-center">
+
+    <div id="dashboard">
+      <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+        Disponibilités
+      </button>
     </div>
+
+    <div id="calendar">
+      <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+        Ajouter un membre
+      </button>
+    </div>
+
+    <div id="stat">
+      <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+        Statistiques
+      </button>
+    </div>
+
+  </div>
 </div>
-
-
 <div class="section bg-white rounded-2xl shadow-sm border max-w-6xl mx-auto mt-10 p-6" id="disponibilités">
     
     <h1 class="text-2xl font-bold text-indigo-900 mb-6">

@@ -198,31 +198,53 @@ function formatDate(dateStr){
 
 
 <!-- Bannière -->
-<div class="container mx-auto p-6 max-w-4xl">
-    <div class="bg-white shadow-lg rounded-3xl p-8 mb-15 flex justify-between items-center border border-gray-100">
-        <div id="dashboard">
-            <button class="transition-colors hover:text-indigo-600"> Tableau de Bord </button>
-        </div>
-        <?php if(isAdmin($idUser)){ ?>
-        <div id="admin">
-            <button class="transition-colors hover:text-indigo-600"> Mes disponibilités </button>
-        </div>
-         <div id="emprunts">
-            <button class="transition-colors hover:text-indigo-600"> Mes emprunts </button>
-        </div>
-        <?php } ?>
-        <div id="calendar">
-            <button class="transition-colors hover:text-indigo-600"> Mes réservations </button>
-        </div>
-        <div id="stat">
-            <button class="transition-colors hover:text-indigo-600"> Statistiques </button>
-        </div>
-        <div id="settings">
-            <button class="transition-colors hover:text-indigo-600"> Paramètres </button>
-        </div>
-    </div>
-</div>
+<div class="container mx-auto p-4 max-w-4xl">
+  <div class="bg-white shadow-lg rounded-3xl p-4 mb-6 border border-gray-100 flex flex-wrap justify-center gap-3 items-center">
 
+    <!-- Menu -->
+    <div id="menu" class="flex flex-wrap justify-center gap-3 w-full">
+
+      <div id="dashboard">
+        <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+          Tableau de Bord
+        </button>
+      </div>
+
+      <?php if(isAdmin($idUser)){ ?>
+      <div id="admin">
+        <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+          Mes disponibilités
+        </button>
+      </div>
+
+      <div id="emprunts">
+        <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+          Mes emprunts
+        </button>
+      </div>
+      <?php } ?>
+
+      <div id="calendar">
+        <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+          Mes réservations
+        </button>
+      </div>
+
+      <div id="stat">
+        <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+          Statistiques
+        </button>
+      </div>
+
+      <div id="settings">
+        <button class="px-6 py-2 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium transition-colors">
+          Paramètres
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
 
 <!-- Tableau de Bord -->
