@@ -1,4 +1,6 @@
 <?php
+/////////////////////////////DECLARATIONS/////////////////////////////////////////////
+
 if (basename($_SERVER["PHP_SELF"]) != "index.php") {
     header("Location:../index.php?view=compte");
     die("");
@@ -22,23 +24,27 @@ $user = lister_user($idUser);
 $reserv_user = lister_reserv_user($idUser) ?: [];
 $dispo = dispo($idUser) ?: [];
 $reserv_ancien_user = lister_reserv_user_ancienne($idUser) ?: [];
+$emprunt_ancien_user = lister_emprunt_user_ancienne($idUser) ?: [];
+$emprunts = lister_emprunt($idUser) ?: [];
+$outils = lister_outil($idUser) ?: [];
 
 ?>
 
 <script>
+    //////////////////////////JS fonctions/////////////////////////////////
     const machines = <?php echo json_encode($machine); ?>;
     const reservations = <?php echo json_encode($reserv); ?>;
     const user = <?php echo json_encode($user); ?>;
 
-    function afficher_form_com(id) {
+    function afficher_form_com(id) {//commentaires
         $("#add-com-" + id).slideToggle(300);
     }
 
-    function Afficher_ancien_reserv(){
+    function Afficher_ancien_reserv(){//anciennes réservations
         $("#ancien_reser").slideToggle(300);
     }
 
- function modif_dispoo(id){
+ function modif_dispoo(id){ /// modifier les dispos affichage
 
     let debut = $("#DEBUTDATE" + id).text();
     let fin = $("#FINDATE" + id).text();
@@ -71,7 +77,7 @@ function formatDate(dateStr){
     return parts[2] + "-" + parts[1] + "-" + parts[0];
 }
 
-    $(document).ready(function () {
+    $(document).ready(function () {//affichage menu
         $("#settings").on("click", function () {
             //$("#param").toggleClass("hidden");
             showSection("param");
@@ -80,6 +86,12 @@ function formatDate(dateStr){
         $("#dashboard").on("click", function () {
             //$("#tabbord").toggleClass("hidden");
             showSection("tabbord");
+            updateTime();
+        });
+
+        $("#emprunts").on("click", function () {
+            //$("#tabbord").toggleClass("hidden");
+            showSection("MesEmprunts");
             updateTime();
         });
 
@@ -94,7 +106,7 @@ function formatDate(dateStr){
             showSection("calendrier");
         });
 
-        $("#stat").on("click", function () {
+        $("#stat").on("click", function () { // générations statisqtiques
 
             showSection("statistique");
 
@@ -108,7 +120,7 @@ function formatDate(dateStr){
             let datas = [];
 
             var barColors = 
-[
+[//couleurs stats
 "rgba(79,70,229,1.0)",    // Indigo principal (#4f46e5)
 "rgba(67,97,238,1.0)",    // Bleu indigo
 "rgba(72,149,239,1.0)",   // Bleu clair moderne
@@ -183,13 +195,16 @@ function formatDate(dateStr){
 
 <!-- Bannière -->
 <div class="container mx-auto p-6 max-w-4xl">
-    <div class="bg-white shadow-lg rounded-3xl p-8 mb-8 flex justify-between items-center border border-gray-100">
+    <div class="bg-white shadow-lg rounded-3xl p-8 mb-15 flex justify-between items-center border border-gray-100">
         <div id="dashboard">
             <button class="transition-colors hover:text-indigo-600"> Tableau de Bord </button>
         </div>
         <?php if(isAdmin($idUser)){ ?>
         <div id="admin">
             <button class="transition-colors hover:text-indigo-600"> Mes disponibilités </button>
+        </div>
+         <div id="emprunts">
+            <button class="transition-colors hover:text-indigo-600"> Mes emprunts </button>
         </div>
         <?php } ?>
         <div id="calendar">
@@ -218,6 +233,7 @@ function formatDate(dateStr){
 
 <!-- disponibilitées -->
     <div class="section hidden container mx-auto p-6 max-w-4xl" id="administration">
+        <!-- barre de recherche -->
         <div class="flex items-center mb-2">
     <input
         id="rechercheDispo"
@@ -238,10 +254,11 @@ function formatDate(dateStr){
         </svg>
     </button>
 </div>
+<!-- si aucune reservations : -->
         <?php if (empty($dispo)) { ?>
         <p class="text-slate-500 italic">Aucune réservation en cours.</p>
     <?php } ?>
-
+<!-- affichage réservations -->
     <?php foreach ($dispo as $res) { ?>
 <form action="controleur.php" method="POST" id="<?= $res["id"] ?>" class="reservation">
     <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow">
@@ -284,7 +301,7 @@ function formatDate(dateStr){
 
 
         </div>
-
+<!-- BOUTON MODIFIER DISPO + requetes PHP -->
         <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
 
                 <button type="button" id="button<?= $res["id"] ?>" onclick='modif_dispoo(<?= $res["id"] ?>)'
@@ -305,7 +322,7 @@ function formatDate(dateStr){
 
 <!-- Calendrier -->
 <div class="section hidden container mx-auto p-6 max-w-4xl" id="calendrier">
-
+<!-- Barre de recherche date -->
 <div class="flex items-center mb-2">
     <input
         id="rechercheMachine"
@@ -327,7 +344,7 @@ function formatDate(dateStr){
         </svg>
     </button>
 </div>
-
+<!-- filtre des machines -->
 <div class="flex flex-wrap gap-2 mb-6">
 <?php foreach ($machine as $mac): 
     $id = "machine_" . $mac["id"];
@@ -343,16 +360,16 @@ function formatDate(dateStr){
     </div>
 <?php endforeach; ?>
 </div>
-
+<!-- bouton pour voir les anciennes reservations -->
 <button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_reserv()">
     Voir d'anciennes réservations
 </button>
-
+<!-- Affichage de ces anciennes réservations  -->
 <div id=ancien_reser class='hidden'>
     
     <?php foreach ($reserv_ancien_user as $res) { ?>
 
-<div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="<?= $res["idReserv"] ?>">
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
 
     <div class="flex justify-between items-start mb-4" >
 
@@ -385,7 +402,7 @@ function formatDate(dateStr){
 
             </div>
         </div>
-
+<!-- petite bannière réserver -->
         <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
             Réservé
         </span>
@@ -393,7 +410,7 @@ function formatDate(dateStr){
     </div>
 
     <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
-
+<!-- bouton signaler un pb -->
             <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
             class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
                 + Signaler un problème
@@ -401,6 +418,7 @@ function formatDate(dateStr){
         </form>
 
     </div>
+    <!-- Ajouter un commentaire, la partie qui s'affiche après appui sur le bouton -->
     <div id='add-com-<?= $res["idReserv"] ?>_' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
             <form action="controleur.php" method="POST" class="flex flex-col gap-3">
                 <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
@@ -420,14 +438,14 @@ function formatDate(dateStr){
 
     
 </div>
-
+<!-- si aucune reservations -->
 <?php if (empty($reserv_user)) { ?>
     <p class="text-slate-500 italic">Aucune réservation en cours.</p>
 <?php } ?>
-
+<!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
 <?php foreach ($reserv_user as $res) { ?>
 
-<div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="<?= $res["idReserv"] ?>">
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
 
         <div class="flex justify-between items-start mb-4" >
 
@@ -466,7 +484,7 @@ function formatDate(dateStr){
         </span>
 
     </div>
-
+<!-- Bouton signaler un pb -->
     <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
 
             <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
@@ -477,7 +495,7 @@ function formatDate(dateStr){
 
         <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
             <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
-
+<!-- Bouton supprimer la résevations -->
             <button type="submit" name="action" value="supprimer"
             class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition-all font-medium">
                 Supprimer la réservation
@@ -485,6 +503,7 @@ function formatDate(dateStr){
         </form>
 
     </div>
+    <!-- formulaire du commenaitre -->
     <div id='add-com-<?= $res["idReserv"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
             <form action="controleur.php" method="POST" class="flex flex-col gap-3">
                 <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
@@ -503,6 +522,211 @@ function formatDate(dateStr){
 <?php } ?>
 
 </div>
+
+
+
+<!-------------------- EMPRUNTS --->
+
+  <div class="section hidden container mx-auto p-6 max-w-4xl" id="MesEmprunts">
+<!-- Barre de recherche date -->
+<div class="flex items-center mb-2">
+    <input
+        id="rechercheEmprunt"
+        type="date"
+        name="rechercheEmprunt"
+        placeholder="Entrez votre recherche..."
+        class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+
+    <button
+        class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
+        <svg
+            class="w-4 h-4 text-gray-600"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+            <line x1="16.65" y1="16.65" x2="22" y2="22"
+                stroke="currentColor" stroke-width="2" />
+        </svg>
+    </button>
+</div>
+<!-- filtre des outils -->
+<div class="flex flex-wrap gap-2 mb-6">
+<?php foreach ($outils as $mac): 
+    $id = "outil_" . $mac["id"];
+?>
+    <div class="relative">
+
+        <input type="checkbox" id="<?= $id ?>" name="outil[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
+
+        <label for="<?= $id ?>"
+               class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
+            <?= htmlspecialchars($mac["nom"]) ?>
+        </label>
+    </div>
+<?php endforeach; ?>
+</div>
+<!-- bouton pour voir les ancien emprunts -->
+<button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_emrpunt()">
+    Voir d'anciens emprunts
+</button>
+<!-- Affichage de ces anciens emprunts  -->
+<div id=ancien_empr class='hidden'>
+    
+    <?php foreach ($emprunt_ancien_user as $res) { ?>
+
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $res["idOutil"] ?>">
+
+    <div class="flex justify-between items-start mb-4" >
+
+        <div>
+            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                <?= $res["nom"] ?>
+            </h3>
+
+            <div class="flex flex-wrap gap-3 mb-2">
+
+                
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                </div>
+
+               
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                   
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduReel"])) ?>
+                </div>
+
+            </div>
+        </div>
+<!-- petite bannière réserver -->
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+            Rendu
+        </span>
+
+    </div>
+
+    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
+<!-- bouton signaler un pb -->
+            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
+            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
+                + Signaler un problème
+            </button>
+        </form>
+
+    </div>
+    <!-- Ajouter un commentaire, la partie qui s'affiche après appui sur le bouton -->
+    <div id='add-com-<?= $res["idReserv"] ?>_' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
+                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
+                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
+                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
+                <div class="flex justify-end">
+                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                        Envoyer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+</div>
+
+<?php } ?>
+
+    
+</div>
+<!-- si aucune reservations -->
+<?php if (empty($emprunts)) { ?>
+    <p class="text-slate-500 italic">Aucune réservation en cours.</p>
+<?php } ?>
+<!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
+<?php foreach ($emprunts as $res) { ?>
+
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+
+        <div class="flex justify-between items-start mb-4" >
+
+        <div>
+            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                <?= $res["nom"] ?>
+            </h3>
+
+            <div class="flex flex-wrap gap-3 mb-2">
+
+                
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                </div>
+
+                
+                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                   
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduTheorique"])) ?>
+                </div>
+
+            </div>
+        </div>
+
+        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+            Emprunté
+        </span>
+
+    </div>
+<!-- Bouton signaler un pb -->
+    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
+
+            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
+            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
+                + Signaler un problème
+            </button>
+        </form>
+
+        <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+            <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
+<!-- Bouton supprimer la résevations -->
+        </form>
+
+    </div>
+    <!-- formulaire du commenaitre -->
+    <div id='add-com-<?= $res["idOutil"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
+                <input type="hidden" name="id_reserv" value="<?= $res["idOutil"] ?>">
+                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
+                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
+                <div class="flex justify-end">
+                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                        Envoyer
+                    </button>
+                </div>
+            </form>
+        </div>
+
+</div>
+
+<?php } ?>
+
+</div>
+
+
+
 
 
 <!-- Statistiques -->
@@ -534,8 +758,10 @@ function formatDate(dateStr){
 
 <script>
 
+//////////////////////////////////AJAX////////////////////////////////////
+
 $(document).ready(function() {
-   function filtrerReserv() {
+   function filtrerReserv() {///filtre avec machine et date
 
     let date = $("#rechercheMachine").val();
     let machines = [];
@@ -543,28 +769,122 @@ $(document).ready(function() {
     $("input[name='machines[]']:checked").each(function(){
         machines.push($(this).val());
     });
+    console.log(date);
+    //if (!date) {
+      //  $(".reservationMac").show();
+        //return;
+    //}
+     $.ajax({
+    url: "ajax.php",
+    type: "GET",
+    data: {
+        action: "filtre_mac_invers",
+        date: date,
+        machines:machines,
+    },
+    dataType: "json",
 
+    success: function(res){
+        console.log("SUCCESS :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idReserv).hide();
+            })
+    },
+
+    error: function(xhr, status, error){
+        console.log("ERREUR AJAX");
+        console.log("Response :", xhr.responseText); 
+        console.log("Status :", status);
+        console.log("Error :", error);
+    }
+
+   })
     $.ajax({
-        url: "ajax.php",
-        type: "GET",
+        url :"ajax.php",
+        type : "GET",
         data: {
-            action: "filtre_mac",
+            action:"filtre_mac",
             date: date,
             machines: machines
         },
         dataType: "json",
-        success: function(reservs){
+        success: function(res){
+            console.log("S :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idReserv).show();
+            })
+        }, 
+        error: function() {
+                    console.log("Erreur lors de la récupération des machines");
+                    console.log("Response :", xhr.responseText); 
+        console.log("Status :", status);
+        console.log("Error :", error);
+                }
+    })
+   }
 
-            $(".reservation").hide();
+function filtrerEmprunts() {///filtre avec machine et date
 
-            reservs.forEach(res => {
-                $("#" + res.idReserv).show();
-            });
+    let date = $("#rechercheEmprunt").val();
+    let machines = [];
 
-        }
+    $("input[name='outil[]']:checked").each(function(){
+        machines.push($(this).val());
     });
+    console.log(date);
+    //if (!date) {
+      //  $(".reservationMac").show();
+        //return;
+    //}
+     $.ajax({
+    url: "ajax.php",
+    type: "GET",
+    data: {
+        action: "filtre_emp_invers",
+        date: date,
+        emprunts:machines,
+    },
+    dataType: "json",
 
-}
+    success: function(res){
+        console.log("SUCCESS :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idOutil).hide();
+            })
+    },
+
+    error: function(xhr, status, error){
+        console.log("ERREUR AJAX");
+        console.log("Response :", xhr.responseText); 
+        console.log("Status :", status);
+        console.log("Error :", error);
+    }
+
+   })
+    $.ajax({
+        url :"ajax.php",
+        type : "GET",
+        data: {
+            action:"filtre_emp",
+            date: date,
+            emprunts: machines
+        },
+        dataType: "json",
+        success: function(res){
+            console.log("S :", res);
+        res.forEach(orep => {
+                $("#res" + orep.idOutil).show();
+            })
+        }, 
+        error: function() {
+                    console.log("Erreur lors de la récupération des machines");
+                    console.log("Response :", xhr.responseText); 
+        console.log("Status :", status);
+        console.log("Error :", error);
+                }
+    })
+   }
+
 
 function filtrerDispo(){
     let date = $("#rechercheDispo").val();
@@ -589,7 +909,7 @@ function filtrerDispo(){
         }, 
         error: function() {
                     console.log("Erreur lors de la récupération des machines");
-                    console.log("Response :", xhr.responseText); // ✅ ici ça marche
+                    console.log("Response :", xhr.responseText); 
         console.log("Status :", status);
         console.log("Error :", error);
                 }
@@ -612,14 +932,14 @@ function filtrerDispo(){
 
     error: function(xhr, status, error){
         console.log("ERREUR AJAX");
-        console.log("Response :", xhr.responseText); // ✅ ici ça marche
+        console.log("Response :", xhr.responseText); 
         console.log("Status :", status);
         console.log("Error :", error);
     }
 });
 
 }
-
+/// appelle la fonction dès changement dans les forms 
 $("#rechercheMachine").on("change", filtrerReserv);
 $("#rechercheDispo").on("change", filtrerDispo);
 $("input[name='machines[]']").on("change", filtrerReserv);

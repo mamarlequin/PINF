@@ -1,311 +1,163 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1deb3
--- https://www.phpmyadmin.net/
---
--- Hôte : localhost:3306
--- Généré le : mar. 10 fév. 2026 à 07:00
--- Version du serveur : 10.11.13-MariaDB-0ubuntu0.24.04.1
--- Version de PHP : 8.3.6
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+-- ========================
+-- TABLE Utilisateur
+-- ========================
+CREATE TABLE `Utilisateur` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nom` varchar(255) NOT NULL,
+  `prenom` varchar(255) NOT NULL,
+  `promotion` int DEFAULT NULL,
+  `motDePasse` varchar(255) NOT NULL,
+  `role` int NOT NULL,
+  `adresseMail` varchar(255) NOT NULL,
+  `dateFinRole` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `adresseMail` (`adresseMail`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de données : `Fablab`
---
-
--- --------------------------------------------------------
-
---
--- Structure de la table `Commentaire`
---
-
-CREATE TABLE IF NOT EXISTS `Commentaire` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `idEquipement` int(10) UNSIGNED NOT NULL,
-  `idUser` int(10) UNSIGNED NOT NULL,
-  `idReservation` int(10) UNSIGNED DEFAULT NULL,
-  `contenu` varchar(255) NOT NULL,
-  `resolu` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `Commentaire`
---
-
-INSERT INTO `Commentaire` (`id`, `idEquipement`, `idUser`, `idReservation`, `contenu`, `resolu`) VALUES
-(2, 1, 1, NULL, 'super commentaire', 0),
-(3, 1, 1, NULL, 'couix', 1);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `Creneau`
---
-
-CREATE TABLE IF NOT EXISTS `Creneau` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `idAdmin` int(10) UNSIGNED NOT NULL,
-  `dateDebut` datetime NOT NULL,
-  `dateFin` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `Emprunt`
---
-
-CREATE TABLE IF NOT EXISTS `Emprunt` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `idUser` int(10) UNSIGNED NOT NULL,
-  `idEquipement` int(10) UNSIGNED NOT NULL,
-  `dateDebut` datetime NOT NULL,
-  `dateRenduTheorique` datetime NOT NULL,
-  `dateRenduReel` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `Equipement`
---
-
-CREATE TABLE IF NOT EXISTS `Equipement` (
-  `id` int(10) UNSIGNED NOT NULL,
+-- ========================
+-- TABLE Equipement
+-- ========================
+CREATE TABLE `Equipement` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `nom` varchar(255) NOT NULL,
   `type` varchar(255) NOT NULL,
   `enMaintenance` tinyint(1) NOT NULL DEFAULT 0,
   `description` varchar(255) NOT NULL,
-  `risque` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `risque` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `Equipement`
---
+-- ========================
+-- TABLE Outil
+-- ========================
+CREATE TABLE `Outil` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nom` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `risque` varchar(255) DEFAULT NULL,
+  `emprunte` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `Equipement` (`id`, `nom`, `type`, `enMaintenance`, `description`, `risque`) VALUES
-(1, 'ma machine', 'super imprimante', 0, 'ma super imprimante jolie et rose', 'trop belle');
+-- ========================
+-- TABLE Creneau
+-- ========================
+CREATE TABLE `Creneau` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idAdmin` int(10) UNSIGNED NOT NULL,
+  `dateDebut` datetime NOT NULL,
+  `dateFin` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY (`idAdmin`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
---
--- Structure de la table `Notification`
---
-
-CREATE TABLE IF NOT EXISTS `Notification` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `idUser` int(10) UNSIGNED NOT NULL,
-  `contenu` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Déchargement des données de la table `Notification`
---
-
-INSERT INTO `Notification` (`id`, `idUser`, `contenu`) VALUES
-(1, 2, 'Vous avez été promu Admin'),
-(2, 2, 'Vous avez été promu Admin'),
-(3, 2, 'Vous avez été promu Admin'),
-(4, 4, 'Vous avez été promu Admin'),
-(5, 2, 'Votre période de délégation est terminée. Vous êtes redevenu Admin.'),
-(6, 2, 'Votre période de délégation est terminée. Vous êtes redevenu Admin.'),
-(7, 2, 'Votre période de délégation est terminée. Vous êtes redevenu Admin.'),
-(8, 2, 'Votre période de délégation est terminée.'),
-(9, 2, 'Votre période de délégation est terminée.'),
-(10, 2, 'Vous avez été promu Admin'),
-(11, 4, 'Vous avez été promu Admin'),
-(12, 2, 'Vous avez été promu Admin'),
-(13, 2, 'Vous avez été promu Admin');
-
--- --------------------------------------------------------
-
---
--- Structure de la table `Reservation`
---
-
-CREATE TABLE IF NOT EXISTS `Reservation` (
-  `id` int(10) UNSIGNED NOT NULL,
+-- ========================
+-- TABLE Reservation
+-- ========================
+CREATE TABLE `Reservation` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `dateDebut` datetime NOT NULL,
   `dateFin` datetime NOT NULL,
   `idEquipement` int(10) UNSIGNED NOT NULL,
-  `idUser` int(10) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `idUser` int(10) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY (`idEquipement`),
+  KEY (`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
+-- ========================
+-- TABLE Emprunt
+-- ========================
+CREATE TABLE `Emprunt` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idUser` int(10) UNSIGNED NOT NULL,
+  `idEquipement` int(10) UNSIGNED NOT NULL,
+  `dateDebut` datetime NOT NULL,
+  `dateRenduTheorique` datetime NOT NULL,
+  `dateRenduReel` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY (`idUser`),
+  KEY (`idEquipement`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Structure de la table `Utilisateur`
---
+-- ========================
+-- TABLE Commentaire
+-- ========================
+CREATE TABLE `Commentaire` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idEquipement` int(10) UNSIGNED NOT NULL,
+  `idUser` int(10) UNSIGNED NOT NULL,
+  `idReservation` int(10) UNSIGNED DEFAULT NULL,
+  `contenu` varchar(255) NOT NULL,
+  `resolu` tinyint(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY (`idEquipement`),
+  KEY (`idUser`),
+  KEY (`idReservation`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS `Utilisateur` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `nom` varchar(255) NOT NULL,
-  `prenom` varchar(255) NOT NULL,
-  `promotion` int(11) DEFAULT NULL,
-  `motDePasse` varchar(255) NOT NULL,
-  `role` int(11) NOT NULL,
-  `adresseMail` varchar(255) NOT NULL,
-  `dateFinRole` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- ========================
+-- TABLE Notification
+-- ========================
+CREATE TABLE `Notification` (
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `idUser` int(10) UNSIGNED NOT NULL,
+  `contenu` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY (`idUser`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Déchargement des données de la table `Utilisateur`
---
+-- ========================
+-- INSERTS
+-- ========================
 
-INSERT INTO `Utilisateur` (`id`, `nom`, `prenom`, `promotion`, `motDePasse`, `role`, `adresseMail`, `dateFinRole`) VALUES
-(1, 'lara', 'lara', 2026, 'lara', 2, 'admin@fablab.fr', NULL),
-(2, 'c', 'couix', 2026, 'FsaXjzvC', 1, 'dhss.lara@gmail.com', '2026-02-09 20:26:00'),
-(4, 'couixtest', 'c', 2026, 'DH42jJx0', 1, 'marceau.luciani@ig2i.centralelille.fr', '2026-02-09 00:00:00');
+INSERT INTO `Utilisateur` (`nom`, `prenom`, `promotion`, `motDePasse`, `role`, `adresseMail`) VALUES
+('DEGEZELLE', 'Eulalie', 2029, 'azerty', 2, 'eulaliedegezelle@gmail.com'),
+('DEHILES', 'COUIX', 2029, 'couix', 1, 'couix.dehiles@gmail.com'),
+('DEHILES', 'LARA', 2029, 'lara', 1, 'lara.dehiles@gmail.com'),
+('Gargamel', 'azraEl', 2026, 'Ap4kcSw0', 1, 'gargameldetestlessmurfs@outlook.org');
 
---
--- Index pour les tables déchargées
---
+INSERT INTO `Equipement` (`nom`, `type`, `enMaintenance`, `description`, `risque`) VALUES
+('Machine 3', 'Laser', 1, 'une certaine description', 'aucun, c''est tranquille'),
+('Imprimante 2', 'Imprimante 3D', 0, 'quelque chose', 'safe'),
+('machine', 'imprimante', 0, 'elle imprime', 'les feuilles ça coupe'),
+('imprimante', 'rayon laser', 0, 'piou', 'le plus safe des safe'),
+('Machine', 'machine', 0, 'c''est une machine', 'tranquille'),
+('Machine à coudre', 'pfaff 3.0 / Patty', 0, 'machine semi électronique', 'RAS'),
+('Surjeteuse', 'Brother 4 fils', 0, 'surjeteuse industrielle', 'attention aux doigts');
 
---
--- Index pour la table `Commentaire`
---
-ALTER TABLE `Commentaire`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `commentaire_idequipement_fk` (`idEquipement`),
-  ADD KEY `commentaire_iduser_fk` (`idUser`),
-  ADD KEY `commentaire_idreservation_fk` (`idReservation`);
+-- ========================
+-- CONTRAINTES
+-- ========================
 
---
--- Index pour la table `Creneau`
---
 ALTER TABLE `Creneau`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `creneau_idadmin_fk` (`idAdmin`);
+ADD CONSTRAINT `fk_creneau_user`
+FOREIGN KEY (`idAdmin`) REFERENCES `Utilisateur`(`id`) ON DELETE CASCADE;
 
---
--- Index pour la table `Emprunt`
---
-ALTER TABLE `Emprunt`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `emprunt_iduser_fk` (`idUser`),
-  ADD KEY `emprunt_idequipement_fk` (`idEquipement`);
-
---
--- Index pour la table `Equipement`
---
-ALTER TABLE `Equipement`
-  ADD PRIMARY KEY (`id`);
-
---
--- Index pour la table `Notification`
---
-ALTER TABLE `Notification`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `notification_idUser_fk` (`idUser`);
-
---
--- Index pour la table `Reservation`
---
 ALTER TABLE `Reservation`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `reservation_idequipement_fk` (`idEquipement`),
-  ADD KEY `reservation_iduser_fk` (`idUser`);
+ADD CONSTRAINT `fk_resa_equipement`
+FOREIGN KEY (`idEquipement`) REFERENCES `Equipement`(`id`) ON DELETE CASCADE,
+ADD CONSTRAINT `fk_resa_user`
+FOREIGN KEY (`idUser`) REFERENCES `Utilisateur`(`id`) ON DELETE CASCADE;
 
---
--- Index pour la table `Utilisateur`
---
-ALTER TABLE `Utilisateur`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `adresseMail` (`adresseMail`);
+ALTER TABLE `Emprunt`
+ADD CONSTRAINT `fk_emprunt_user`
+FOREIGN KEY (`idUser`) REFERENCES `Utilisateur`(`id`) ON DELETE CASCADE,
+ADD CONSTRAINT `fk_emprunt_equipement`
+FOREIGN KEY (`idEquipement`) REFERENCES `Outil`(`id`) ON DELETE CASCADE;
 
---
--- AUTO_INCREMENT pour les tables déchargées
---
-
---
--- AUTO_INCREMENT pour la table `Commentaire`
---
 ALTER TABLE `Commentaire`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+ADD CONSTRAINT `fk_commentaire_equipement`
+FOREIGN KEY (`idEquipement`) REFERENCES `Equipement`(`id`) ON DELETE CASCADE,
+ADD CONSTRAINT `fk_commentaire_user`
+FOREIGN KEY (`idUser`) REFERENCES `Utilisateur`(`id`) ON DELETE CASCADE,
+ADD CONSTRAINT `fk_commentaire_resa`
+FOREIGN KEY (`idReservation`) REFERENCES `Reservation`(`id`) ON DELETE SET NULL;
 
---
--- AUTO_INCREMENT pour la table `Creneau`
---
-ALTER TABLE `Creneau`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `Emprunt`
---
-ALTER TABLE `Emprunt`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `Equipement`
---
-ALTER TABLE `Equipement`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT pour la table `Notification`
---
 ALTER TABLE `Notification`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+ADD CONSTRAINT `fk_notification_user`
+FOREIGN KEY (`idUser`) REFERENCES `Utilisateur`(`id`) ON DELETE CASCADE;
 
---
--- AUTO_INCREMENT pour la table `Reservation`
---
-ALTER TABLE `Reservation`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `Utilisateur`
---
-ALTER TABLE `Utilisateur`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- Contraintes pour les tables déchargées
---
-
---
--- Contraintes pour la table `Commentaire`
---
-ALTER TABLE `Commentaire`
-  ADD CONSTRAINT `commentaire_idequipement_fk` FOREIGN KEY (`idEquipement`) REFERENCES `Equipement` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `commentaire_idreservation_fk` FOREIGN KEY (`idReservation`) REFERENCES `Reservation` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `commentaire_iduser_fk` FOREIGN KEY (`idUser`) REFERENCES `Utilisateur` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `Creneau`
---
-ALTER TABLE `Creneau`
-  ADD CONSTRAINT `creneau_idadmin_fk` FOREIGN KEY (`idAdmin`) REFERENCES `Utilisateur` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `Emprunt`
---
-ALTER TABLE `Emprunt`
-  ADD CONSTRAINT `emprunt_idequipement_fk` FOREIGN KEY (`idEquipement`) REFERENCES `Equipement` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `emprunt_iduser_fk` FOREIGN KEY (`idUser`) REFERENCES `Utilisateur` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `Notification`
---
-ALTER TABLE `Notification`
-  ADD CONSTRAINT `notification_idUser_fk` FOREIGN KEY (`idUser`) REFERENCES `Utilisateur` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `Reservation`
---
-ALTER TABLE `Reservation`
-  ADD CONSTRAINT `reservation_idequipement_fk` FOREIGN KEY (`idEquipement`) REFERENCES `Equipement` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reservation_iduser_fk` FOREIGN KEY (`idUser`) REFERENCES `Utilisateur` (`id`) ON DELETE CASCADE;
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

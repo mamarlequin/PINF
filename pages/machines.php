@@ -14,6 +14,7 @@ if (!isset($_SESSION["idUser"])) {
 ?>
 <div class="flex items-center mb-6">
     <button id='add_form' class='bg-indigo-600 text-white px-5 py-2 rounded-3xl hover:bg-indigo-700 transition-all mr-2 shadow-sm active:scale-95' onclick='afficher_form()'>+</button>
+    <!-- barre de recherche -->
     <input
         id="rechercheMachine"
         type="text"
@@ -35,6 +36,7 @@ if (!isset($_SESSION["idUser"])) {
     </button>
 	<?php if (isAdmin($_SESSION["idUser"])): ?>
 	<?php 
+    //recupère les selects
 		$machines_nb = lister_machine();
 		$reserv_nb = lister_reserv();
 	?>
@@ -77,6 +79,7 @@ if (isAdmin($_SESSION["idUser"])) {
     endForm();
 }
 ?>
+<!-- Listage des machines -->
 <div class="groupe1 bg-white items-center" id="stat-" style='display:none;'>
 	<canvas id="myChart" width="500" height="300"></canvas>
 </div>
@@ -94,6 +97,7 @@ foreach ($machines as $machine) {
             <div>
                 <h3 class="text-2xl font-bold text-indigo-600 mb-2"><?= $machine["nom"] ?></h3>
                 <?php
+                //aAffichage du statu de maintenance
                 if ($isMaintenance) {
                 ?>
                     <span class="text-sm font-medium px-2.5 py-0.5 rounded-full bg-red-100 text-red-700">
@@ -101,7 +105,7 @@ foreach ($machines as $machine) {
                     </span>
                 <?php } ?>
             </div>
-
+<!-- Pour supprimer la réservation -->
             <?php if (isAdmin($_SESSION["idUser"])): ?>
                 <form action="controleur.php" method="POST" onsubmit="return confirm('Supprimer cette machine ?');">
                     <input type="hidden" name="id" value="<?= $machine["id"] ?>">
@@ -122,12 +126,13 @@ foreach ($machines as $machine) {
         </div>
 
         <div class="flex flex-wrap gap-3 items-center border-t border-slate-100 pt-4">
-
+<!-- Bouton pour voir les commentaires -->
             <button class='flex-1 sm:flex-none bg-indigo-100 text-indigo-700 px-5 py-2 rounded-xl hover:bg-indigo-200 transition-all font-medium' onclick='afficher_com(<?= $machine["id"] ?>)'>
                 Voir les commentaires
             </button>
 
 			<?php if (isAdmin($_SESSION["idUser"])): ?>
+                <!-- Afficher le form pour ajouter un commentaire -->
             <button class='flex-1 sm:flex-none bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-700 transition-all font-medium' onclick='afficher_form_com(<?= $machine["id"] ?>)'>
                 + Ajouter un commentaire
             </button>
@@ -146,7 +151,7 @@ foreach ($machines as $machine) {
 
 
         </div>
-
+<!-- FORMULAIRE DU COM -->
         <div id='add-com-<?= $machine["id"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
             <form action="controleur.php" method="POST" class="flex flex-col gap-3">
                 <input type="hidden" name="id_equip" value="<?= $machine["id"] ?>">
@@ -169,7 +174,7 @@ foreach ($machines as $machine) {
                     Aucun Commentaire
                 </p><?php
                 }
-
+//////////////////////////////////AFFICHER LES COMMENTAIRES///////////////////////////////////////////////
                 foreach ($commentaires as $commentaire): ?>
 
                 <br>
@@ -196,6 +201,7 @@ foreach ($machines as $machine) {
                     <?php // endif; ?>
 					--->
                     <div class="flex items-center gap-2 mt-2">
+                        <!-- AFFICHER LE STATUT -->
                         <?php if ($commentaire["resolu"] == 0): ?>
                             <span class="text-sm font-bold uppercase text-red-600 tracking-wide">
                                 NON RESOLU
@@ -252,7 +258,7 @@ foreach ($machines as $machine) {
         $("#hid").slideToggle(500);
     }
 
-	function afficher_stat(machines, reservations){
+	function afficher_stat(machines, reservations){//afficher les stats
     const statDiv = $("#stat-");
 
     // Affiche le div et seulement après on crée le chart
