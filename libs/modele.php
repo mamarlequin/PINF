@@ -629,7 +629,6 @@ function lister_emprunt_user_ancienne($id){
 	        AND Emprunt.dateRenduReel IS NOT NULL";
 	return parcoursRs(SQLSelect($SQL));
 }
-<<<<<<< HEAD
 function rechercher_outil_ajax($mot) {
 	$mot = "%$mot%";
 	$SQL = "SELECT id FROM Outil WHERE nom LIKE '$mot' AND emprunte = 0";
@@ -660,7 +659,6 @@ function enregistrer_emprunt($idOutil, $idUser, $dateRetour) {
 
 }
 
-=======
 
 function recherche_emp_filtre($idUser, $date = null, $machines = []) {
     $idUser = intval($idUser);
@@ -733,5 +731,4 @@ function recherche_emp_filtre_dispa($idUser, $date = null, $machines = []) {
 }
 
 
->>>>>>> 7e489af42189e946e8a49fe11c8f63488afe56d2
 ?>
