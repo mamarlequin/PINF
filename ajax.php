@@ -1,21 +1,21 @@
 <?php
 session_start();
 include_once "libs/maLibSQL.pdo.php";
-include_once "libs/modele.php"; 
-include_once "libs/maLibUtils.php"; 
+include_once "libs/modele.php";
+include_once "libs/maLibUtils.php";
 
 header('Content-Type: application/json');
 
 $action = valider("action");
 
-switch($action) {
+switch ($action) {
     case "charger_donnees_semaine":
-        $offset = (int)valider("offset"); 
-        
+        $offset = (int)valider("offset");
+
         $lundi = new DateTime('monday this week');
         $lundi->modify("$offset weeks");
         $debutSemaine = $lundi->format('Y-m-d 00:00:00');
-        
+
         $dimanche = clone $lundi;
         $dimanche->modify('+6 days');
         $finSemaine = $dimanche->format('Y-m-d 23:59:59');
@@ -30,7 +30,7 @@ switch($action) {
 
     case "search":
         $mot = valider("mot");
-        echo json_encode(recherche_machine($mot)); 
+        echo json_encode(recherche_machine($mot));
         break;
 
     case "disparaitre":
@@ -40,20 +40,20 @@ switch($action) {
 
     case "filtrerDispo":
         $date = valider("date");
-        echo json_encode(recherche_dispo_filtre($_SESSION["idUser"], $date)); 
+        echo json_encode(recherche_dispo_filtre($_SESSION["idUser"], $date));
         break;
 
     case "filtrerDispodispa":
         $date = valider("date");
-        echo json_encode(recherche_dispo_filtre_dispa($_SESSION["idUser"], $date)); 
+        echo json_encode(recherche_dispo_filtre_dispa($_SESSION["idUser"], $date));
         break;
 
     case "filtre_mac":
         $date = valider("date");
         $machines = valider("machines");
-        echo json_encode(recherche_machine_filtre($_SESSION["idUser"], $date, $machines)); 
+        echo json_encode(recherche_machine_filtre($_SESSION["idUser"], $date, $machines));
         break;
-    
+
     case "filtre_mac_invers":
         $date = valider("date");
         $machines = valider("machines");
@@ -67,17 +67,20 @@ switch($action) {
 
     case "search_user":
         $mot = valider("mot");
-        echo json_encode(recherche_user($mot)); 
+        echo json_encode(recherche_user($mot));
         break;
 
     case "disparaitre_user":
         $mot = valider("mot");
         echo json_encode(disparait_user($mot));
         break;
+    case "rechercher_outil_ajax":
+        $mot = valider("mot");
+        $resultats = rechercher_outil_ajax($mot);
+        echo json_encode($resultats);
+        break;
 
-        
     default:
         http_response_code(400);
         echo json_encode(["error" => "Action inconnue"]);
 }
-

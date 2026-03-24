@@ -83,6 +83,23 @@ if ($action = valider("action")) {
 			);
 			break;
 
+		case 'RealiserEmprunt':
+
+			$idOutil = valider("id_outil");
+
+			$idUser = $_SESSION["idUser"];
+
+			$dateRetourChoisie = valider("dateFinLabel");
+
+
+			if ($idOutil && $idUser && $dateRetourChoisie) {
+				$dateRetourFinale = $dateRetourChoisie . " 23:59:59";
+				enregistrer_emprunt($idOutil, $idUser, $dateRetourFinale);
+				header("Location: index.php?view=emprunts&msg=ok");
+			}
+
+			break;
+
 		case 'Créer le nouvel équipement':
 			$nom = valider("nom");
 			$type = valider("type");
@@ -134,24 +151,23 @@ if ($action = valider("action")) {
 			}
 			break;
 
-		case 'supprimer' : 
+		case 'supprimer':
 			$id = valider("id");
-			if($id){
+			if ($id) {
 				suppr_reserv($id);
 				$qs = array("view" => "compte", "msg" => "Réservation supprimée !");
 			}
 
 			break;
 
-		case 'Ajouter Commentaire eleve' : 
+		case 'Ajouter Commentaire eleve':
 			$idReserv = valider("id_reserv");
 			$idequi = valider("id_equip");
 			$texte = valider("texte");
 			$idUser = $_SESSION["idUser"];
-			if($idReserv && $idequi && $texte && $idUser){
+			if ($idReserv && $idequi && $texte && $idUser) {
 				ajouter_commentaire_eleve($idequi, $idUser, $texte, $idReserv);
 				$qs = array("view" => "compte", "msg" => "Commentaire ajouté ! ");
-
 			}
 
 
@@ -273,21 +289,19 @@ if ($action = valider("action")) {
 			if ($idCreneau && $dated && $hD && $hF && $datef) {
 				$debut = $dated . " " . $hD . ":00";
 				$fin = $datef . " " . $hF . ":00";
-				if($debut > $fin){
-				modifier_dispo($idCreneau, $fin, $debut);
-				}
-				else {
-				modifier_dispo($idCreneau, $debut, $fin);
+				if ($debut > $fin) {
+					modifier_dispo($idCreneau, $fin, $debut);
+				} else {
+					modifier_dispo($idCreneau, $debut, $fin);
 				}
 
 				include_once("libs/modele.php");
 			}
 			header("Location: index.php?view=compte");
 			break;
-		
+
 		case 'reserver':
-			if (isset($_SESSION["idUser"]))
-			{
+			if (isset($_SESSION["idUser"])) {
 				$idUser = $_SESSION["idUser"];
 				$idMachine = valider("id_machine");
 				$date = valider("date_res");
@@ -296,20 +310,17 @@ if ($action = valider("action")) {
 
 				$flag = 1;
 
-				if($deb > $fin)
-				{
+				if ($deb > $fin) {
 					$qs = array("view" => "reserver", "msg" => "L'heure de début est plus grande que l'heure de fin");
 					break;
 				}
-				
-				foreach(lister_machine() as $machine)
-				{
-					if($machine["id"] == $idMachine)
+
+				foreach (lister_machine() as $machine) {
+					if ($machine["id"] == $idMachine)
 						$flag = 0;
 				}
-				
-				if($flag)
-				{
+
+				if ($flag) {
 					$qs = array("view" => "reserver", "msg" => "La machine n'existe pas");
 					break;
 				}
@@ -322,8 +333,7 @@ if ($action = valider("action")) {
 				} else {
 					$qs = array("view" => "reserver", "msg" => "Réservation impossible");
 				}
-				
-			} 
+			}
 			break;
 		case '-':
 			if ($id = valider("id")) {
@@ -331,8 +341,7 @@ if ($action = valider("action")) {
 				$qs = array("view" => "machines", "msg" => "Suppression réussie");
 			} else $qs = array("view" => "machines", "msg" => "Suppression échouée");
 		case "modifier":
-			if(isset($_SESSION["idUser"]))
-			{
+			if (isset($_SESSION["idUser"])) {
 				$idUser = $_SESSION["idUser"];
 				$idMachine = valider("id_machine");
 				$date = valider("date_res");
@@ -342,40 +351,35 @@ if ($action = valider("action")) {
 
 				$flag = 1;
 
-				if($deb > $fin)
-				{
+				if ($deb > $fin) {
 					$qs = array("view" => "reserver", "msg" => "L'heure de début est plus grande que l'heure de fin");
 					break;
 				}
-				
-				foreach(lister_machine() as $machine)
-				{
-					if($machine["id"] == $idMachine)
+
+				foreach (lister_machine() as $machine) {
+					if ($machine["id"] == $idMachine)
 						$flag = 0;
 				}
-			
-				if($flag)
-				{
+
+				if ($flag) {
 					$qs = array("view" => "reserver", "msg" => "La machine n'existe pas");
 					break;
 				}
 
-				$flag=1;
+				$flag = 1;
 
-				foreach(lister_res_tot($date, $date) as $res)
-				{
-					if($res["id"] == $idRes)
+				foreach (lister_res_tot($date, $date) as $res) {
+					if ($res["id"] == $idRes)
 						$flag = 0;
 				}
 
 
-				if($flag)
-				{
+				if ($flag) {
 					$qs = array("view" => "reserver", "msg" => "La reservation n'existe pas");
 					break;
 				}
 
-				$check = verif_reserv($idMachine, $date . " " . $deb . ":00", $date . " " . $fin . ":00",$idRes);
+				$check = verif_reserv($idMachine, $date . " " . $deb . ":00", $date . " " . $fin . ":00", $idRes);
 
 				if (!empty($check)) {
 					suppr_reserv($idRes);

@@ -605,7 +605,13 @@ function lister_emprunt($id){
 }
 
 function lister_outil(){
-	$SQL ="SELECT * FROM Outil";
+	$SQL ="SELECT * FROM Outil ";
+	return parcoursRs(SQLSelect($SQL));
+}
+
+
+function lister_outil_dispo(){
+	$SQL ="SELECT * FROM Outil WHERE emprunte = 0";
 	return parcoursRs(SQLSelect($SQL));
 }
 
@@ -617,4 +623,34 @@ function lister_emprunt_user_ancienne($id){
 	        AND Emprunt.dateRenduTheorique IS NOT NULL";
 	return parcoursRs(SQLSelect($SQL));
 }
+function rechercher_outil_ajax($mot) {
+	$mot = "%$mot%";
+	$SQL = "SELECT id FROM Outil WHERE nom LIKE '$mot' AND emprunte = 0";
+    return parcoursRs(SQLSelect($SQL));
+
+}
+
+function lister_emprunts_actifs(){
+    $SQL = "SELECT Outil.nom, Emprunt.dateRenduTheorique, Utilisateur.prenom 
+            FROM Emprunt 
+            JOIN Outil ON Outil.id = Emprunt.idEquipement 
+            JOIN Utilisateur ON Utilisateur.id = Emprunt.idUser
+            WHERE Outil.emprunte = 1 
+            AND Emprunt.dateRenduReel IS NULL";
+    return parcoursRs(SQLSelect($SQL));
+}
+
+function enregistrer_emprunt($idOutil, $idUser, $dateRetour) {
+    $sqlInsert = "INSERT INTO Emprunt (idUser, idEquipement, dateDebut, dateRenduTheorique) 
+
+                  VALUES ($idUser, $idOutil, NOW(), '$dateRetour')";
+
+    SQLInsert($sqlInsert);
+
+    $sqlUpdate = "UPDATE Outil SET emprunte = 1 WHERE id = $idOutil";
+
+    SQLUpdate($sqlUpdate);
+
+}
+
 ?>
