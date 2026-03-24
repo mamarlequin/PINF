@@ -212,6 +212,7 @@ function modifierRes(id, date, e) {
     $("#form-machine-modif").val(id);
     $("#form-date-modif").val(date);
     $("#form-id-modif").val($(e.currentTarget).attr("id"));
+    $("#form-id-modif2").val($(e.currentTarget).attr("id"));
 
     var nom = $(e.currentTarget).parent().attr("data-nom");
     $("#info-modif").text((nom ? nom : "Machine " + id) + " le " + date);
@@ -379,6 +380,13 @@ $(document).ready(function() {
 
         <button type="submit" name="action" value="modifier" class="w-full bg-indigo-600 text-white py-2 rounded text-sm hover:bg-indigo-700">
             Valider
+        </button>
+
+    </form>
+    <form action="controleur.php" method="POST" class="space-y-3">
+        <input type="hidden" name="id" id="form-id-modif2">
+        <button type="submit" name="action" value="supprimer" class="w-full bg-red-600 text-white py-2 rounded text-sm hover:bg-red-700">
+            Supprimer
         </button>
     </form>
 </div>
