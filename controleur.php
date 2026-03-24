@@ -349,6 +349,12 @@ if ($action = valider("action")) {
 				$fin = valider("fin");
 				$idRes = valider("id_res");
 
+				if(get_user_reserv($idRes) != $idUser)
+				{
+					$qs = array("view" => "reserver", "msg" => "Modification impossible");
+					break;
+				}
+
 				$flag = 1;
 
 				if ($deb > $fin) {

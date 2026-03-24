@@ -40,6 +40,10 @@ $outils = lister_outil($idUser) ?: [];
         $("#add-com-" + id).slideToggle(300);
     }
 
+    function Afficher_ancien_emrpunt(){
+    $("#ancien_empr").slideToggle(300);
+}
+
     function Afficher_ancien_reserv(){//anciennes réservations
         $("#ancien_reser").slideToggle(300);
     }
@@ -533,7 +537,7 @@ function formatDate(dateStr){
     <input
         id="rechercheEmprunt"
         type="date"
-        name="rechercheEmprunt"
+        name="rechercheEmpruntt"
         placeholder="Entrez votre recherche..."
         class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
 
@@ -615,43 +619,20 @@ function formatDate(dateStr){
 
     </div>
 
-    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
-<!-- bouton signaler un pb -->
-            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
-            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
-                + Signaler un problème
-            </button>
-        </form>
-
-    </div>
-    <!-- Ajouter un commentaire, la partie qui s'affiche après appui sur le bouton -->
-    <div id='add-com-<?= $res["idReserv"] ?>_' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
-                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
-                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
-                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
-                <div class="flex justify-end">
-                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
-                        Envoyer
-                    </button>
-                </div>
-            </form>
-        </div>
-
-</div>
-
 <?php } ?>
 
     
 </div>
+</div>
+
 <!-- si aucune reservations -->
 <?php if (empty($emprunts)) { ?>
-    <p class="text-slate-500 italic">Aucune réservation en cours.</p>
+    <p class="text-slate-500 italic">Aucun emprunts en cours.</p>
 <?php } ?>
 <!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
 <?php foreach ($emprunts as $res) { ?>
 
-<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $res["idOutil"] ?>">
 
         <div class="flex justify-between items-start mb-4" >
 
@@ -691,33 +672,7 @@ function formatDate(dateStr){
 
     </div>
 <!-- Bouton signaler un pb -->
-    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
 
-            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
-            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
-                + Signaler un problème
-            </button>
-        </form>
-
-        <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
-            <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
-<!-- Bouton supprimer la résevations -->
-        </form>
-
-    </div>
-    <!-- formulaire du commenaitre -->
-    <div id='add-com-<?= $res["idOutil"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
-                <input type="hidden" name="id_reserv" value="<?= $res["idOutil"] ?>">
-                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
-                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
-                <div class="flex justify-end">
-                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
-                        Envoyer
-                    </button>
-                </div>
-            </form>
-        </div>
 
 </div>
 
@@ -849,7 +804,7 @@ function filtrerEmprunts() {///filtre avec machine et date
     success: function(res){
         console.log("SUCCESS :", res);
         res.forEach(orep => {
-                $("#res" + orep.idOutil).hide();
+                $("#emp" + orep.idReserv).hide();
             })
     },
 
@@ -873,7 +828,7 @@ function filtrerEmprunts() {///filtre avec machine et date
         success: function(res){
             console.log("S :", res);
         res.forEach(orep => {
-                $("#res" + orep.idOutil).show();
+                $("#emp" + orep.idOutil).show();
             })
         }, 
         error: function() {
@@ -943,6 +898,9 @@ function filtrerDispo(){
 $("#rechercheMachine").on("change", filtrerReserv);
 $("#rechercheDispo").on("change", filtrerDispo);
 $("input[name='machines[]']").on("change", filtrerReserv);
+$("input[name='outil[]']").on("change", filtrerEmprunts);
+$("#rechercheEmprunt").on("change", filtrerEmprunts);
+
 
 })
 </script>

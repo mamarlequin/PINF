@@ -53,7 +53,23 @@ switch ($action) {
         $machines = valider("machines");
         echo json_encode(recherche_machine_filtre($_SESSION["idUser"], $date, $machines));
         break;
+<<<<<<< HEAD
 
+=======
+    
+    case "filtre_emp_invers":
+        $date = valider("date");
+        $machines = valider("emprunts");
+        echo json_encode(recherche_emp_filtre_dispa($_SESSION["idUser"], $date, $machines)); 
+        break;
+
+    case "filtre_emp":
+        $date = valider("date");
+        $machines = valider("emprunts");
+        echo json_encode(recherche_emp_filtre($_SESSION["idUser"], $date, $machines)); 
+        break;
+    
+>>>>>>> 7e489af42189e946e8a49fe11c8f63488afe56d2
     case "filtre_mac_invers":
         $date = valider("date");
         $machines = valider("machines");
