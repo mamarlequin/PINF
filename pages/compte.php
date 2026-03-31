@@ -258,40 +258,151 @@ function formatDate(dateStr){
 
 
 <!-- disponibilitées -->
-    <div class="section hidden container mx-auto p-6 max-w-4xl" id="administration">
-        <!-- barre de recherche -->
-        <div class="flex items-center mb-2">
-    <input
-        id="rechercheDispo"
-        type="date"
-        name="recherche"
-        class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+<div class="section hidden container mx-auto p-6 max-w-4xl" id="administration">
+            <!-- barre de recherche -->
+            <div class="flex items-center mb-2">
+        <input
+            id="rechercheDispo"
+            type="date"
+            name="recherche"
+            class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
 
-    <button
-        class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
-        <svg
-            class="w-4 h-4 text-gray-600"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
-            <line x1="16.65" y1="16.65" x2="22" y2="22"
-                stroke="currentColor" stroke-width="2" />
-        </svg>
-    </button>
+        <button
+            class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
+            <svg
+                class="w-4 h-4 text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                <line x1="16.65" y1="16.65" x2="22" y2="22"
+                    stroke="currentColor" stroke-width="2" />
+            </svg>
+        </button>
+    </div>
+    <!-- si aucune reservations : -->
+            <?php if (empty($dispo)) { ?>
+            <p class="text-slate-500 italic">Aucune réservation en cours.</p>
+        <?php } ?>
+    <!-- affichage réservations -->
+        <?php foreach ($dispo as $res) { ?>
+    <form action="controleur.php" method="POST" id="<?= $res["id"] ?>" class="reservation">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow">
+
+                <div class="flex justify-between items-start mb-4" >
+
+                <div>
+
+                    <div class="flex flex-wrap gap-3 mb-2">
+
+                        
+                        <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                            
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Début: <p id="DEBUTDATE<?= $res["id"] ?>"><?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?></p>
+                        <input type="date" value="" id="datedebut<?= $res["id"] ?>" class="hidden" name="datedebut"
+                        required  min="<?= date('Y-m-d'); ?>">
+                            <input type="time"  id="heuredebut<?= $res["id"] ?>" class="hidden" name="heuredebut" required  min="<?= date('Y-m-d'); ?>">
+                            
+                        </div>
+
+                        
+                        <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Fin: <p id="FINDATE<?= $res["id"] ?>"><?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?></p>
+                            <input type="date" id="datefin<?= $res["id"] ?>" class="hidden" name="datefin" required  min="<?= date('Y-m-d'); ?>">
+                            <input type="time"  id="heurefin<?= $res["id"] ?>" class="hidden" name="heurefin" required  min="<?= date('Y-m-d'); ?>">
+                        </div>
+                        
+
+                    </div>
+                </div>
+
+
+            </div>
+    <!-- BOUTON MODIFIER DISPO + requetes PHP -->
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
+
+                    <button type="button" id="button<?= $res["id"] ?>" onclick='modif_dispoo(<?= $res["id"] ?>)'
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
+                        Modifier la disponibilité
+                    </button>
+                    <input type="hidden" name="id" value="<?= $res["id"] ?>">
+                    <button type="submit" name="action" id="enreg<?= $res["id"] ?>" class="bg-indigo-600 hidden text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium" value="Enregistrer les modifications" >Enregistrer les modifications</button>
+                
+
+            </div>
+
+        </div>
+    </form>
+        <?php } ?>
 </div>
-<!-- si aucune reservations : -->
-        <?php if (empty($dispo)) { ?>
-        <p class="text-slate-500 italic">Aucune réservation en cours.</p>
-    <?php } ?>
-<!-- affichage réservations -->
-    <?php foreach ($dispo as $res) { ?>
-<form action="controleur.php" method="POST" id="<?= $res["id"] ?>" class="reservation">
-    <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow">
 
-            <div class="flex justify-between items-start mb-4" >
+
+<!-- Calendrier -->
+<div class="section hidden container mx-auto p-6 max-w-4xl" id="calendrier">
+    <!-- Barre de recherche date -->
+    <div class="flex items-center mb-2">
+        <input
+            id="rechercheMachine"
+            type="date"
+            name="recherche"
+            placeholder="Entrez votre recherche..."
+            class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+
+        <button
+            class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
+            <svg
+                class="w-4 h-4 text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                <line x1="16.65" y1="16.65" x2="22" y2="22"
+                    stroke="currentColor" stroke-width="2" />
+            </svg>
+        </button>
+    </div>
+    <!-- filtre des machines -->
+    <div class="flex flex-wrap gap-2 mb-6">
+    <?php foreach ($machine as $mac): 
+        $id = "machine_" . $mac["id"];
+    ?>
+        <div class="relative">
+
+            <input type="checkbox" id="<?= $id ?>" name="machines[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
+
+            <label for="<?= $id ?>"
+                class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
+                <?= htmlspecialchars($mac["nom"]) ?>
+            </label>
+        </div>
+    <?php endforeach; ?>
+    </div>
+    <!-- bouton pour voir les anciennes reservations -->
+    <button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_reserv()">
+        Voir d'anciennes réservations
+    </button>
+    <!-- Affichage de ces anciennes réservations  -->
+    <div id=ancien_reser class='hidden'>
+        
+        <?php foreach ($reserv_ancien_user as $res) { ?>
+
+    <div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+
+        <div class="flex justify-between items-start mb-4" >
 
             <div>
+                <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                    <?= $res["nom"] ?>
+                </h3>
 
                 <div class="flex flex-wrap gap-3 mb-2">
 
@@ -302,11 +413,83 @@ function formatDate(dateStr){
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Début: <p id="DEBUTDATE<?= $res["id"] ?>"><?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?></p>
-                    <input type="date" value="" id="datedebut<?= $res["id"] ?>" class="hidden" name="datedebut"
-                    required  min="<?= date('Y-m-d'); ?>">
-                         <input type="time"  id="heuredebut<?= $res["id"] ?>" class="hidden" name="heuredebut" required  min="<?= date('Y-m-d'); ?>">
+                        Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                    </div>
+
+                
+                    <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
+                    </div>
+
+                </div>
+            </div>
+    <!-- petite bannière réserver -->
+            <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+                Réservé
+            </span>
+
+        </div>
+
+        <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
+    <!-- bouton signaler un pb -->
+                <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
+                class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
+                    + Signaler un problème
+                </button>
+            </form>
+
+        </div>
+        <!-- Ajouter un commentaire, la partie qui s'affiche après appui sur le bouton -->
+        <div id='add-com-<?= $res["idReserv"] ?>_' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                <form action="controleur.php" method="POST" class="flex flex-col gap-3">
+                    <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
+                    <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
+                    <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                            Envoyer
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+    </div>
+
+    <?php } ?>
+
+        
+    </div>
+    <!-- si aucune reservations -->
+    <?php if (empty($reserv_user)) { ?>
+        <p class="text-slate-500 italic">Aucune réservation en cours.</p>
+    <?php } ?>
+    <!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
+    <?php foreach ($reserv_user as $res) { ?>
+
+    <div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
+
+            <div class="flex justify-between items-start mb-4" >
+
+            <div>
+                <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                    <?= $res["nom"] ?>
+                </h3>
+
+                <div class="flex flex-wrap gap-3 mb-2">
+
+                    
+                    <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
                         
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
                     </div>
 
                     
@@ -316,236 +499,53 @@ function formatDate(dateStr){
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        Fin: <p id="FINDATE<?= $res["id"] ?>"><?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?></p>
-                        <input type="date" id="datefin<?= $res["id"] ?>" class="hidden" name="datefin" required  min="<?= date('Y-m-d'); ?>">
-                         <input type="time"  id="heurefin<?= $res["id"] ?>" class="hidden" name="heurefin" required  min="<?= date('Y-m-d'); ?>">
+                        Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
                     </div>
-                    
 
                 </div>
             </div>
 
+            <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+                Réservé
+            </span>
 
         </div>
-<!-- BOUTON MODIFIER DISPO + requetes PHP -->
+    <!-- Bouton signaler un pb -->
         <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
 
-                <button type="button" id="button<?= $res["id"] ?>" onclick='modif_dispoo(<?= $res["id"] ?>)'
+                <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
                 class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
-                    Modifier la disponibilité
+                    + Signaler un problème
                 </button>
-                <input type="hidden" name="id" value="<?= $res["id"] ?>">
-                <button type="submit" name="action" id="enreg<?= $res["id"] ?>" class="bg-indigo-600 hidden text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium" value="Enregistrer les modifications" >Enregistrer les modifications</button>
-            
+            </form>
+
+            <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
+                <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
+    <!-- Bouton supprimer la résevations -->
+                <button type="submit" name="action" value="supprimer"
+                class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition-all font-medium">
+                    Supprimer la réservation
+                </button>
+            </form>
 
         </div>
+        <!-- formulaire du commenaitre -->
+        <div id='add-com-<?= $res["idReserv"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                <form action="controleur.php" method="POST" class="flex flex-col gap-3">
+                    <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
+                    <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
+                    <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
+                    <div class="flex justify-end">
+                        <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
+                            Envoyer
+                        </button>
+                    </div>
+                </form>
+            </div>
 
     </div>
-</form>
+
     <?php } ?>
-    </div>
-
-
-<!-- Calendrier -->
-<div class="section hidden container mx-auto p-6 max-w-4xl" id="calendrier">
-<!-- Barre de recherche date -->
-<div class="flex items-center mb-2">
-    <input
-        id="rechercheMachine"
-        type="date"
-        name="recherche"
-        placeholder="Entrez votre recherche..."
-        class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
-
-    <button
-        class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
-        <svg
-            class="w-4 h-4 text-gray-600"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
-            <line x1="16.65" y1="16.65" x2="22" y2="22"
-                stroke="currentColor" stroke-width="2" />
-        </svg>
-    </button>
-</div>
-<!-- filtre des machines -->
-<div class="flex flex-wrap gap-2 mb-6">
-<?php foreach ($machine as $mac): 
-    $id = "machine_" . $mac["id"];
-?>
-    <div class="relative">
-
-        <input type="checkbox" id="<?= $id ?>" name="machines[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
-
-        <label for="<?= $id ?>"
-               class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
-            <?= htmlspecialchars($mac["nom"]) ?>
-        </label>
-    </div>
-<?php endforeach; ?>
-</div>
-<!-- bouton pour voir les anciennes reservations -->
-<button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_reserv()">
-    Voir d'anciennes réservations
-</button>
-<!-- Affichage de ces anciennes réservations  -->
-<div id=ancien_reser class='hidden'>
-    
-    <?php foreach ($reserv_ancien_user as $res) { ?>
-
-<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
-
-    <div class="flex justify-between items-start mb-4" >
-
-        <div>
-            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
-                <?= $res["nom"] ?>
-            </h3>
-
-            <div class="flex flex-wrap gap-3 mb-2">
-
-                
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                    
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
-                </div>
-
-               
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                   
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
-                </div>
-
-            </div>
-        </div>
-<!-- petite bannière réserver -->
-        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
-            Réservé
-        </span>
-
-    </div>
-
-    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
-<!-- bouton signaler un pb -->
-            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
-            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
-                + Signaler un problème
-            </button>
-        </form>
-
-    </div>
-    <!-- Ajouter un commentaire, la partie qui s'affiche après appui sur le bouton -->
-    <div id='add-com-<?= $res["idReserv"] ?>_' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
-                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
-                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
-                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
-                <div class="flex justify-end">
-                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
-                        Envoyer
-                    </button>
-                </div>
-            </form>
-        </div>
-
-</div>
-
-<?php } ?>
-
-    
-</div>
-<!-- si aucune reservations -->
-<?php if (empty($reserv_user)) { ?>
-    <p class="text-slate-500 italic">Aucune réservation en cours.</p>
-<?php } ?>
-<!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
-<?php foreach ($reserv_user as $res) { ?>
-
-<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="res<?= $res["idReserv"] ?>">
-
-        <div class="flex justify-between items-start mb-4" >
-
-        <div>
-            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
-                <?= $res["nom"] ?>
-            </h3>
-
-            <div class="flex flex-wrap gap-3 mb-2">
-
-                
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                    
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
-                </div>
-
-                
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                   
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateFin"])) ?>
-                </div>
-
-            </div>
-        </div>
-
-        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
-            Réservé
-        </span>
-
-    </div>
-<!-- Bouton signaler un pb -->
-    <div class="flex justify-end gap-3 border-t border-slate-100 pt-4 flex-wrap">
-
-            <button onclick='afficher_form_com(<?= $res["idReserv"] ?>)'
-            class="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-600 transition-all font-medium">
-                + Signaler un problème
-            </button>
-        </form>
-
-        <form action="controleur.php" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?');">
-            <input type="hidden" name="id" value="<?= $res["idReserv"] ?>">
-<!-- Bouton supprimer la résevations -->
-            <button type="submit" name="action" value="supprimer"
-            class="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600 transition-all font-medium">
-                Supprimer la réservation
-            </button>
-        </form>
-
-    </div>
-    <!-- formulaire du commenaitre -->
-    <div id='add-com-<?= $res["idReserv"] ?>' style='display:none;' class="mt-4 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-            <form action="controleur.php" method="POST" class="flex flex-col gap-3">
-                <input type="hidden" name="id_reserv" value="<?= $res["idReserv"] ?>">
-                <input type="hidden" name="id_equip" value="<?= $res["idEquip"] ?>">
-                <textarea name="texte" placeholder="Décrivez le problème ou l'information importante..." class="w-full p-3 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none" rows="2" required></textarea>
-                <div class="flex justify-end">
-                    <button type="submit" name="action" value="Ajouter Commentaire eleve" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all">
-                        Envoyer
-                    </button>
-                </div>
-            </form>
-        </div>
-
-</div>
-
-<?php } ?>
 
 </div>
 
@@ -553,152 +553,153 @@ function formatDate(dateStr){
 
 <!-------------------- EMPRUNTS --->
 
-  <div class="section hidden container mx-auto p-6 max-w-4xl" id="MesEmprunts">
-<!-- Barre de recherche date -->
-<div class="flex items-center mb-2">
-    <input
-        id="rechercheEmprunt"
-        type="date"
-        name="rechercheEmpruntt"
-        placeholder="Entrez votre recherche..."
-        class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
+<div class="section hidden container mx-auto p-6 max-w-4xl" id="MesEmprunts">
+    <!-- Barre de recherche date -->
+    <div class="flex items-center mb-2">
+        <input
+            id="rechercheEmprunt"
+            type="date"
+            name="rechercheEmpruntt"
+            placeholder="Entrez votre recherche..."
+            class="h-10 px-4 py-2 border border-gray-300 !rounded-l-full focus:outline-none focus:ring-2 focus:ring-gray-300">
 
-    <button
-        class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
-        <svg
-            class="w-4 h-4 text-gray-600"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
-            <line x1="16.65" y1="16.65" x2="22" y2="22"
-                stroke="currentColor" stroke-width="2" />
-        </svg>
-    </button>
-</div>
-<!-- filtre des outils -->
-<div class="flex flex-wrap gap-2 mb-6">
-<?php foreach ($outils as $mac): 
-    $id = "outil_" . $mac["id"];
-?>
-    <div class="relative">
-
-        <input type="checkbox" id="<?= $id ?>" name="outil[]" value="<?= $mac["id"] ?>" class="hidden peer" checked>
-
-        <label for="<?= $id ?>"
-               class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
-            <?= htmlspecialchars($mac["nom"]) ?>
-        </label>
+        <button
+            class="h-10 px-4 py-2 border border-gray-300 border-l-0 rounded-r-full hover:bg-indigo-600 !text-white ">
+            <svg
+                class="w-4 h-4 text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+                <line x1="16.65" y1="16.65" x2="22" y2="22"
+                    stroke="currentColor" stroke-width="2" />
+            </svg>
+        </button>
     </div>
-<?php endforeach; ?>
-</div>
-<!-- bouton pour voir les ancien emprunts -->
-<button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_emrpunt()">
-    Voir d'anciens emprunts
-</button>
-<!-- Affichage de ces anciens emprunts  -->
-<div id=ancien_empr class='hidden'>
-    
-    <?php foreach ($emprunt_ancien_user as $res) { ?>
+    <!-- filtre des outils -->
+    <div class="flex flex-wrap gap-2 mb-6">
+    <?php foreach ($outils as $outil): 
+        $id = "outil_" . $outil["id"];
+    ?>
+        <div class="relative">
 
-<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $res["idOutil"] ?>">
+            <input type="checkbox" id="<?= $id ?>" name="outil[]" value="<?= $outil["id"] ?>" class="hidden peer" checked>
 
-    <div class="flex justify-between items-start mb-4" >
-
-        <div>
-            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
-                <?= $res["nom"] ?>
-            </h3>
-
-            <div class="flex flex-wrap gap-3 mb-2">
-
-                
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                    
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
-                </div>
-
-               
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                   
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduReel"])) ?>
-                </div>
-
-            </div>
+            <label for="<?= $id ?>"
+                class="inline-block cursor-pointer px-3 py-1 rounded-full text-white bg-indigo-400 peer-checked:bg-indigo-600 transition-colors font-medium select-none text-sm">
+                <?= htmlspecialchars($outil["nom"]) ?>
+            </label>
         </div>
-<!-- petite bannière réserver -->
-        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
-            Rendu
-        </span>
-
+    <?php endforeach; ?>
     </div>
+    <!-- bouton pour voir les ancien emprunts -->
+    <button class="block mx-auto bg-indigo-200 text-gray-700 px-5 py-2 rounded-xl hover:bg-indigo-400 transition-all font-medium mb-8" onclick="Afficher_ancien_emrpunt()">
+        Voir d'anciens emprunts
+    </button>
+    <!-- Affichage de ces anciens emprunts  -->
+    <div id=ancien_empr class='hidden'>
+        
+        <?php foreach ($emprunt_ancien_user as $emprunt) { ?>
 
-<?php } ?>
-
-    
-</div>
-</div>
-
-<!-- si aucune reservations -->
-<?php if (empty($emprunts)) { ?>
-    <p class="text-slate-500 italic">Aucun emprunts en cours.</p>
-<?php } ?>
-<!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
-<?php foreach ($emprunts as $res) { ?>
-
-<div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $res["idOutil"] ?>">
+    <div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $emprunt["idOutil"] ?>">
 
         <div class="flex justify-between items-start mb-4" >
 
-        <div>
-            <h3 class="text-2xl font-bold text-indigo-600 mb-3">
-                <?= $res["nom"] ?>
-            </h3>
+            <div>
+                <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                    <?= $emprunt["nom"] ?>
+                </h3>
 
-            <div class="flex flex-wrap gap-3 mb-2">
+                <div class="flex flex-wrap gap-3 mb-2">
 
-                
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
                     
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
-                </div>
+                    <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                    </div>
 
                 
-                <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
-                   
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduTheorique"])) ?>
-                </div>
+                    <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Fin: <?= date("d/m/Y H:i", strtotime($emprunt["dateRenduReel"])) ?>
+                    </div>
 
+                </div>
             </div>
+    <!-- petite bannière réserver -->
+            <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+                Rendu
+            </span>
+
         </div>
 
-        <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
-            Emprunté
-        </span>
+    <?php } ?>
+
+        
+    </div>
+    </div>
+
+    <!-- si aucune reservations -->
+    <?php if (empty($emprunts)) { ?>
+        <p class="text-slate-500 italic">Aucun emprunts en cours.</p>
+    <?php } ?>
+    <!-- Sinon affichage des réservations qui se passe après la date du jour ou aujourd'hui -->
+    <?php foreach ($emprunts as $emprunt) { ?>
+
+    <div class="reservationMac bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm hover:shadow-md transition-shadow" id="emp<?= $emprunt["idOutil"] ?>">
+
+            <div class="flex justify-between items-start mb-4" >
+
+            <div>
+                <h3 class="text-2xl font-bold text-indigo-600 mb-3">
+                    <?= $emprunt["nom"] ?>
+                </h3>
+
+                <div class="flex flex-wrap gap-3 mb-2">
+
+                    
+                    <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Début: <?= date("d/m/Y H:i", strtotime($res["dateDebut"])) ?>
+                    </div>
+
+                    
+                    <div class="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium shadow-sm">
+                    
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Fin: <?= date("d/m/Y H:i", strtotime($res["dateRenduTheorique"])) ?>
+                    </div>
+
+                </div>
+            </div>
+
+            <span class="text-sm font-medium px-3 py-1 rounded-full bg-indigo-100 text-indigo-700">
+                Emprunté
+            </span>
+
+        </div>
+        
+    <!-- Bouton signaler un pb -->
+
 
     </div>
-<!-- Bouton signaler un pb -->
 
-
-</div>
-
-<?php } ?>
+    <?php } ?>
 
 </div>
 
@@ -803,10 +804,10 @@ $(document).ready(function() {
 function filtrerEmprunts() {///filtre avec machine et date
 
     let date = $("#rechercheEmprunt").val();
-    let machines = [];
+    let emprunts = [];
 
     $("input[name='outil[]']:checked").each(function(){
-        machines.push($(this).val());
+        emprunts.push($(this).val());
     });
     console.log(date);
     //if (!date) {
@@ -819,14 +820,14 @@ function filtrerEmprunts() {///filtre avec machine et date
     data: {
         action: "filtre_emp_invers",
         date: date,
-        emprunts:machines,
+        emprunts:emprunts,
     },
     dataType: "json",
 
     success: function(res){
         console.log("SUCCESS :", res);
         res.forEach(orep => {
-                $("#emp" + orep.idReserv).hide();
+                $("#emp" + orep.idOutil).hide();
             })
     },
 
@@ -844,7 +845,7 @@ function filtrerEmprunts() {///filtre avec machine et date
         data: {
             action:"filtre_emp",
             date: date,
-            emprunts: machines
+            emprunts: emprunts
         },
         dataType: "json",
         success: function(res){

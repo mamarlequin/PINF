@@ -709,7 +709,7 @@ function recherche_emp_filtre_dispa($idUser, $date = null, $machines = []) {
 
     $SQL = "
         SELECT 
-            Emprunt.id AS idReserv,
+            Emprunt.id AS idOutil,
             Emprunt.dateDebut,
             Emprunt.dateRenduTheorique,
             Outil.id AS idEquip,
