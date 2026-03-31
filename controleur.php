@@ -137,7 +137,7 @@ if ($action = valider("action")) {
 
 		case 'Marquer comme résolu':
 			$id = valider("id");
-			if ($id) {
+			if ($id && isAdmin($_SESSION["idUser"])) {
 				marquer_resolu($id);
 				$qs = array("view" => "machines", "msg" => "Commentaire mis à jour !");
 			}
@@ -145,7 +145,7 @@ if ($action = valider("action")) {
 
 		case 'Marquer comme non résolu':
 			$id = valider("id");
-			if ($id) {
+			if ($id && isAdmin($_SESSION["idUser"])) {
 				marquer_non_resolu($id);
 				$qs = array("view" => "machines", "msg" => "Commentaire mis à jour !");
 			}
@@ -153,7 +153,7 @@ if ($action = valider("action")) {
 
 		case 'supprimer':
 			$id = valider("id");
-			if ($id) {
+			if ($id && isAdmin($_SESSION["idUser"])) {
 				suppr_reserv($id);
 				$qs = array("view" => "compte", "msg" => "Réservation supprimée !");
 			}
@@ -184,7 +184,7 @@ if ($action = valider("action")) {
 			if ($role === false || $role === "") $role = 0;
 			else $role = (int)$role;
 
-			if ($nom && $prenom && $email) {
+			if ($nom && $prenom && $email && isAdmin($_SESSION["idUser"])) {
 				include_once("libs/modele.php");
 
 
@@ -210,7 +210,7 @@ if ($action = valider("action")) {
 			$id = valider("id_equip");
 			$etat = valider("etat_actuel");
 
-			if ($id !== false && $etat !== false) {
+			if ($id !== false && $etat !== false && isAdmin($_SESSION["idUser"])) {
 				include_once("libs/modele.php");
 				set_maintenance($id, $etat);
 				$msg = "Statut de la machine mis à jour.";
